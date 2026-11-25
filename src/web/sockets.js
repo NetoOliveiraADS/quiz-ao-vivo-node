@@ -1,4 +1,4 @@
-import { AcaoInvalida } from '../erros.js';
+import { AcaoInvalida } from '../jogo/AcaoInvalida.js';
 import { ConexaoSocket } from './ConexaoSocket.js';
 import { vemDesteComputador } from './rede.js';
 

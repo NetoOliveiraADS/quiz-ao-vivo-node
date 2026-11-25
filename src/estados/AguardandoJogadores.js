@@ -1,4 +1,4 @@
-import { AcaoInvalida } from '../erros.js';
+import { AcaoInvalida } from '../jogo/AcaoInvalida.js';
 import { EstadoPartida } from './EstadoPartida.js';
 import { PerguntaAberta } from './PerguntaAberta.js';
 

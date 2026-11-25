@@ -20,7 +20,7 @@ No Windows, também é possível dar dois cliques em `iniciar.bat`. Na primeira 
 | Apresentador | No notebook que executa o servidor, abra `http://localhost:3000/telao`. O navegador abre automaticamente quando possível. |
 | Jogador | Leia o QR do telão ou digite o endereço de rede mostrado nele. Para jogar no próprio notebook, abra `http://localhost:3000/` em outra janela. |
 
-Para usar outra porta, execute `npm start -- --porta 3001`. Para escolher o momento de abrir o telão, use `npm start -- --sem-navegador`. O endereço usado aparece no terminal. Encerre com **Ctrl+C**.
+Para usar outra porta, execute `npm start -- --porta 3001`. Para escolher o momento de abrir o telão, use `npm start -- --sem-navegador`. O endereço para os jogadores aparece no telão. Encerre com **Ctrl+C**.
 
 ## Conduzir uma partida
 
@@ -38,9 +38,10 @@ A tecla **→** avança a etapa. **Espaço** também avança quando o foco está
 
 | Local | Responsabilidade |
 |---|---|
-| `servidor.js` | Lê as perguntas, obtém a partida e liga Express e Socket.IO. |
-| `src/GerenciadorPartida.js` | **Singleton**. Fornece a mesma partida durante a execução do servidor. |
-| `src/Partida.js`, `src/Jogador.js`, `src/Pergunta.js` | Regras do jogo, participantes e perguntas. |
+| `servidor.js` | Ponto de entrada de `npm start` e `iniciar.bat`. Carrega `src/aplicacao/iniciarServidor.js`. |
+| `src/aplicacao/` | `iniciarServidor.js` liga Express e Socket.IO, `configuracao.js` lê as opções do servidor e `lerPerguntas.js` carrega o quiz de `perguntas.txt`. |
+| `src/jogo/` | `Partida`, `Jogador` e `Pergunta` guardam as regras e os dados do jogo. `AcaoInvalida` representa uma jogada que as regras impedem. |
+| `src/jogo/GerenciadorPartida.js` | **Singleton**. Fornece a mesma partida durante a execução do servidor. |
 | `src/estados/` | **State**. Define as ações permitidas e as transições de cada fase. |
 | `src/pontuacao/` | **Strategy**. Define as duas formas de calcular os pontos. |
 | `src/observadores/`, `src/web/ConexaoSocket.js` | **Observer**. Liga as mudanças da partida ao console e às telas inscritas. |
@@ -56,4 +57,4 @@ ME | 25 | Qual padrão define as fases da partida? | *State | Strategy | Observe
 VF | 20 | Um acerto na regra Simples vale 1.000 pontos. | V
 ```
 
-Se a rede da sala isolar os aparelhos, conecte o notebook e os celulares ao mesmo ponto de acesso móvel. O jogo funciona na rede local após a instalação. Para exibir também um QR de acesso ao Wi-Fi, copie `config.exemplo.json` para `config.json`, preencha o nome e a senha da rede que deseja apresentar e reinicie. Se os celulares não abrirem o endereço, confira a rede usada, o IP mostrado no terminal e a permissão do Node.js nessa rede.
+Se a rede da sala isolar os aparelhos, conecte o notebook e os celulares ao mesmo ponto de acesso móvel. O jogo funciona na rede local após a instalação. Para exibir também um QR de acesso ao Wi-Fi, copie `config.exemplo.json` para `config.json`, preencha o nome e a senha da rede que deseja apresentar e reinicie. Se os celulares não abrirem o endereço, confira a rede usada, o endereço mostrado no telão e a permissão do Node.js nessa rede.
