@@ -2,10 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Lê as configurações em três camadas, e a última manda:
- *   1. os valores padrão (abaixo);
- *   2. o arquivo config.json, se existir (copie o config.exemplo.json);
- *   3. os argumentos da linha de comando: --porta 3001 e --sem-navegador.
+ * Parte dos valores padrão, lê o config.json opcional da raiz
+ * e aplica por último os argumentos da linha de comando.
  */
 export function lerConfiguracao(pastaDoProjeto, argumentos) {
   const config = {

@@ -3,10 +3,10 @@
   "version": "2.0.0",
   "description": "Quiz ao vivo com os padrões Singleton, State, Observer e Strategy.",
   "type": "module",
-  "main": "servidor.js",
+  "main": "src/aplicacao/servidor.js",
   "scripts": {
-    "start": "node servidor.js",
-    "dev": "node --watch servidor.js"
+    "start": "node src/aplicacao/servidor.js",
+    "dev": "node --watch src/aplicacao/servidor.js"
   },
   "engines": {
     "node": ">=18"

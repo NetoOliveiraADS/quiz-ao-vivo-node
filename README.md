@@ -13,7 +13,7 @@ npm ci
 npm start
 ```
 
-No Windows, também é possível dar dois cliques em `iniciar.bat`. Na primeira execução, ele instala as dependências. Conecte o notebook e os celulares à mesma rede antes de ligar o servidor.
+Para iniciar diretamente pelo Node, execute `node src/aplicacao/servidor.js`. No Windows, também é possível dar dois cliques em `iniciar.bat`. Na primeira execução, ele instala as dependências. Conecte o notebook e os celulares à mesma rede antes de ligar o servidor.
 
 | Quem | Onde abrir |
 |---|---|
@@ -38,8 +38,7 @@ A tecla **→** avança a etapa. **Espaço** também avança quando o foco está
 
 | Local | Responsabilidade |
 |---|---|
-| `servidor.js` | Ponto de entrada de `npm start` e `iniciar.bat`. Carrega `src/aplicacao/iniciarServidor.js`. |
-| `src/aplicacao/` | `iniciarServidor.js` liga Express e Socket.IO, `configuracao.js` lê as opções do servidor e `lerPerguntas.js` carrega o quiz de `perguntas.txt`. |
+| `src/aplicacao/` | [servidor.js](src/aplicacao/servidor.js) liga Express e Socket.IO à partida. `configuracao.js` lê as opções e `lerPerguntas.js` carrega o quiz de `perguntas.txt`. |
 | `src/jogo/` | `Partida`, `Jogador` e `Pergunta` guardam as regras e os dados do jogo. `AcaoInvalida` representa uma jogada que as regras impedem. |
 | `src/jogo/GerenciadorPartida.js` | **Singleton**. Fornece a mesma partida durante a execução do servidor. |
 | `src/estados/` | **State**. Define as ações permitidas e as transições de cada fase. |
@@ -57,4 +56,16 @@ ME | 25 | Qual padrão define as fases da partida? | *State | Strategy | Observe
 VF | 20 | Um acerto na regra Simples vale 1.000 pontos. | V
 ```
 
-Se a rede da sala isolar os aparelhos, conecte o notebook e os celulares ao mesmo ponto de acesso móvel. O jogo funciona na rede local após a instalação. Para exibir também um QR de acesso ao Wi-Fi, copie `config.exemplo.json` para `config.json`, preencha o nome e a senha da rede que deseja apresentar e reinicie. Se os celulares não abrirem o endereço, confira a rede usada, o endereço mostrado no telão e a permissão do Node.js nessa rede.
+Se a rede da sala isolar os aparelhos, conecte o notebook e os celulares ao mesmo ponto de acesso móvel. O jogo funciona na rede local após a instalação. Se os celulares não abrirem o endereço, confira a rede usada, o endereço mostrado no telão e a permissão do Node.js nessa rede.
+
+O servidor usa a porta 3000 por padrão. Para exibir também o QR de acesso ao Wi-Fi, crie um `config.json` ao lado de `package.json`, preencha os dados da rede e reinicie o servidor.
+
+```json
+{
+  "porta": 3000,
+  "wifi": {
+    "nome": "NOME_DA_REDE",
+    "senha": "SENHA_DA_REDE"
+  }
+}
+```

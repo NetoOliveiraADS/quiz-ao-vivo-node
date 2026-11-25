@@ -6,7 +6,7 @@
 
 ### 1. Apresentar a ideia e o ponto de entrada
 
-**Abra** [servidor.js](../servidor.js). A única linha carrega [iniciarServidor.js](../src/aplicacao/iniciarServidor.js). Abra esse segundo arquivo e mostre, na ordem, `lerPerguntas`, `GerenciadorPartida.obterInstancia`, `partida.inscrever`, `configurarRotas` e `configurarSockets`.
+**Abra** [src/aplicacao/servidor.js](../src/aplicacao/servidor.js), o arquivo que o `npm start` executa. Mostre, na ordem, `lerPerguntas`, `GerenciadorPartida.obterInstancia`, `partida.inscrever`, `configurarRotas` e `configurarSockets`.
 
 **Fala sugerida**
 
@@ -26,7 +26,7 @@
 
 ### 3. Singleton · Quem fornece a partida?
 
-**Abra** [GerenciadorPartida.js](../src/jogo/GerenciadorPartida.js). Aponte para `static #instancia`, `obterInstancia`, `constructor` e `get partida`. Volte à linha em `iniciarServidor.js` que lê `gerenciador.partida`.
+**Abra** [GerenciadorPartida.js](../src/jogo/GerenciadorPartida.js). Aponte para `static #instancia`, `obterInstancia`, `constructor` e `get partida`. Volte à linha em `servidor.js` que lê `gerenciador.partida`.
 
 > Imaginem que cada conexão criasse sua própria sala. O celular da Ana somaria pontos em uma partida e o projetor consultaria outra. O gerenciador existe para fornecer uma referência comum.
 >
