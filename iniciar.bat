@@ -18,5 +18,5 @@ if not exist node_modules (
     exit /b 1
   )
 )
-node servidor.js %*
+node "src/aplicacao/servidor.js" %*
 pause
