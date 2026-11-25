@@ -8,6 +8,8 @@ import { PerguntaAberta } from './PerguntaAberta.js';
  * Não pode: responder (a pergunta já fechou).
  */
 export class MostrandoResultado extends EstadoPartida {
+  rotulo = 'Resultado da pergunta';
+
   get nome() {
     return 'RESULTADO';
   }

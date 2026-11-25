@@ -8,6 +8,8 @@ import { PerguntaAberta } from './PerguntaAberta.js';
  * Não pode: responder (ainda não existe pergunta!).
  */
 export class AguardandoJogadores extends EstadoPartida {
+  rotulo = 'Aguardando jogadores';
+
   get nome() {
     return 'AGUARDANDO';
   }

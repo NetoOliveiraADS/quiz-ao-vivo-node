@@ -1,0 +1,188 @@
+body.telao {
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* ---------- topo ---------- */
+.topo { grid-column: 1 / -1; display: flex; align-items: center; gap: 20px; padding: 12px 36px; }
+.topo .marca { font-size: 26px; }
+.info-topo { margin-left: auto; color: rgba(255, 255, 255, 0.9); font-size: 18px; font-weight: 700; }
+.conexao-caiu { padding: 6px 12px; border-radius: 999px; background: var(--erro); border: 2px solid #fff; color: #fff; font-size: 14px; font-weight: 700; }
+.topo #btn-bastidores[aria-expanded="true"] { background: #fff; border-color: #fff; color: var(--verde-escuro); }
+body.so-assistindo .controle { display: none !important; }
+
+/* ---------- palco ---------- */
+.palco { overflow: auto; grid-column: 1; grid-row: 2; min-width: 0; min-height: 0; padding: 22px 36px 30px; }
+.tela { display: none; height: 100%; flex-direction: column; gap: 22px; }
+.tela.ativa { display: flex; }
+.tela.entrada { animation: entrar 0.45s ease both; }
+.rodape { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--texto-2); font-size: clamp(17px, 1.5vw, 24px); font-weight: 700; }
+.rodape strong { color: var(--texto); }
+.rodape .botao { font-size: clamp(17px, 1.4vw, 22px); }
+
+/* ---------- sala de espera ---------- */
+.convite { flex: none; display: flex; gap: clamp(20px, 3vw, 40px); padding: clamp(16px, 3vh, 30px) clamp(22px, 3vw, 38px); border-radius: 28px; background: var(--cartao); border: 1px solid var(--borda); border-top: 7px solid var(--verde); box-shadow: var(--sombra); }
+.passo-entrada { flex: 1; min-width: 0; display: flex; align-items: center; gap: clamp(16px, 2vw, 32px); }
+.passo-texto { flex: 1; min-width: 0; container-type: inline-size; }
+.rotulo { margin: 0; color: var(--texto-2); font-size: clamp(14px, 1.3vw, 20px); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+/* O endereço cabe sempre em uma linha: o tamanho acompanha a largura do cartão. */
+.url { margin: 4px 0 10px; color: var(--verde-escuro); font-size: clamp(28px, 3.6vw, 80px); font-size: clamp(22px, 8.4cqw, 84px); font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; }
+.dica { margin: 0; max-width: 52ch; color: var(--texto-2); font-size: clamp(14px, 1.2vw, 20px); }
+.dica strong { color: var(--texto); }
+.qr { flex: none; padding: 10px; border-radius: 16px; background: #fff; border: 2px solid var(--borda); line-height: 0; }
+.qr img { display: block; width: clamp(110px, min(15vw, 21vh), 230px); height: auto; aspect-ratio: 1; }
+/* Com o Wi-Fi configurado, os dois passos ficam um embaixo do outro: cada endereço ganha a largura toda. */
+.convite.dois-passos { flex-direction: column; gap: 12px; }
+.convite.dois-passos .passo-entrada + .passo-entrada { padding-left: 0; border-left: 0; padding-top: 12px; border-top: 1px solid var(--borda); }
+.convite.dois-passos .qr { padding: 7px; border-radius: 12px; }
+.convite.dois-passos .qr img { width: clamp(80px, min(9vw, 12.5vh), 150px); }
+.convite.dois-passos .url { margin: 2px 0 4px; font-size: clamp(22px, 7cqw, 56px); }
+.espera-baixo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
+.painel { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: clamp(14px, 2.4vh, 22px) clamp(16px, 2vw, 26px); border-radius: 24px; background: var(--cartao); border: 1px solid var(--borda); }
+.painel h2 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 20px; }
+.contador { min-width: 34px; padding: 2px 10px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 16px; text-align: center; }
+.chips { flex: 1; min-height: 0; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--verde-claro); color: var(--verde-escuro); font-size: clamp(15px, 1.2vw, 20px); font-weight: 800; animation: pop 0.35s ease both; }
+.chip .x { color: var(--erro); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
+.chip:hover { background: #fbe4e4; color: var(--vermelho); }
+.chip:hover .x { opacity: 1; }
+body.so-assistindo .chip .x { display: none; }
+.vazio { margin: 0; color: var(--texto-2); font-size: 18px; }
+.estrategias { display: flex; flex-wrap: wrap; gap: 8px; }
+.estrategia { padding: 0.5em 1.05em; border-radius: 999px; background: var(--cartao-2); border: 2px solid transparent; font-size: clamp(15px, 1.1vw, 21px); font-weight: 700; white-space: nowrap; }
+.estrategia:hover { background: var(--fundo-2); }
+.estrategia.ativa { border-color: var(--verde); background: var(--verde-claro); color: var(--verde-escuro); }
+.descricao-estrategia { margin: 0; min-height: 2.7em; color: var(--texto-2); font-size: clamp(14px, 1vw, 19px); line-height: 1.35; }
+.acoes-espera { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
+.acoes-espera button { white-space: nowrap; }
+/* Projetor com pouca resolução: economiza espaço na sala de espera. */
+@media (max-width: 1279px) {
+  .estrategia { padding: 0.4em 0.8em; }
+  .acoes-espera { gap: 8px; }
+}
+
+/* ---------- pergunta ---------- */
+.cabeca { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.tipo { align-self: flex-start; padding: 8px 14px; border-radius: 999px; background: var(--verde-claro); color: var(--verde-escuro); font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.relogio { display: grid; place-items: center; width: clamp(72px, 7vw, 112px); aspect-ratio: 1; border-radius: 50%; background: var(--cartao); border: 6px solid var(--verde); box-shadow: var(--sombra); font-size: clamp(30px, 3.3vw, 54px); font-weight: 900; font-variant-numeric: tabular-nums; }
+.relogio.urgente { border-color: var(--erro); color: var(--erro); animation: pulsar 0.5s ease-in-out infinite alternate; }
+.enunciado { margin: 0; font-size: clamp(28px, 3.5vw, 60px); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
+.opcoes { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 18px; }
+.opcao { display: flex; align-items: center; gap: 18px; padding: 16px 26px; border-radius: 22px; background: var(--cor); color: var(--cor-texto); font-size: clamp(21px, 2.2vw, 38px); font-weight: 800; line-height: 1.15; box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.18); }
+.tela.entrada .opcao { animation: entrar 0.4s ease both; }
+.tela.entrada .opcao:nth-child(2) { animation-delay: 0.07s; }
+.tela.entrada .opcao:nth-child(3) { animation-delay: 0.14s; }
+.tela.entrada .opcao:nth-child(4) { animation-delay: 0.21s; }
+.barra-tempo { flex: none; height: 12px; border-radius: 999px; overflow: hidden; background: var(--trilho); }
+.barra-tempo div { height: 100%; transform-origin: left; background: linear-gradient(90deg, var(--verde-escuro), var(--verde)); }
+
+/* ---------- resultado ---------- */
+.resultado-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 26px; }
+.resultado-grid > div { min-height: 0; display: flex; flex-direction: column; gap: 16px; }
+.enunciado-menor { margin: 0; font-size: clamp(22px, 2.2vw, 36px); line-height: 1.2; }
+.titulo-placar { margin: 0; font-size: 22px; }
+.barras { display: grid; gap: 12px; }
+.barra { position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 16px; background: var(--cartao); border: 1px solid var(--borda); font-size: clamp(18px, 1.7vw, 28px); font-weight: 700; }
+.barra > * { position: relative; }
+.barra .letra { background: var(--cor); color: var(--cor-texto); }
+.barra .enche { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--cor); opacity: 0.2; transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.barra .qtd { margin-left: auto; font-variant-numeric: tabular-nums; }
+.barra.certa { box-shadow: inset 0 0 0 3px var(--ok); }
+.barra.certa .enche { opacity: 0.35; }
+.barra.errada { opacity: 0.55; }
+.placar { list-style: none; margin: 0; padding: 0; display: grid; align-content: start; gap: 10px; overflow: auto; }
+.placar li { display: grid; grid-template-columns: 3.2ch minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; background: var(--cartao); border: 1px solid var(--borda); font-size: clamp(16px, 1.45vw, 24px); font-weight: 700; }
+.placar li:first-child { background: var(--verde-claro); border-color: var(--verde); box-shadow: inset 0 0 0 1px var(--verde); }
+.placar .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.placar .ganho { color: var(--ok); font-size: 0.8em; }
+.placar .pts, .placar .pos { font-variant-numeric: tabular-nums; }
+.placar .pos { color: var(--texto-2); }
+
+/* ---------- final ---------- */
+.titulo-final { margin: 0; text-align: center; font-size: clamp(30px, 3.4vw, 56px); }
+.podio { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-end; gap: 20px; }
+.degrau { width: min(27%, 300px); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.degrau .nome { max-width: 100%; text-align: center; font-size: clamp(20px, 2.2vw, 38px); font-weight: 900; overflow-wrap: anywhere; }
+.degrau .pts { color: var(--texto-2); font-size: clamp(15px, 1.3vw, 20px); font-weight: 700; }
+.bloco { width: 100%; display: grid; justify-items: center; align-content: start; padding-top: 14px; border-radius: 18px 18px 6px 6px; color: var(--texto); font-size: clamp(30px, 3.4vw, 58px); font-weight: 900; box-shadow: inset 0 -10px 0 rgba(0, 0, 0, 0.12); transform-origin: bottom; animation: subir 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.p1 .bloco { height: 40vh; background: #f2b705; animation-delay: 0.5s; }
+.p2 .bloco { height: 29vh; background: #cfd8dc; animation-delay: 0.25s; }
+.p3 .bloco { height: 21vh; background: #d08a4e; }
+.p1 .nome::before { content: "👑 "; }
+@keyframes subir { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.resto { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; color: var(--texto-2); font-size: 17px; font-weight: 700; }
+.resto strong { color: var(--texto); }
+
+/* O placar cabe sob as alternativas e acompanha cada resposta aceita. */
+.placar-ao-vivo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--borda);
+}
+.placar-ao-vivo h2 { margin: 0; font-size: 16px; }
+.placar-ao-vivo ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.placar-ao-vivo li { display: flex; gap: 7px; font-variant-numeric: tabular-nums; }
+.placar-ao-vivo strong { color: var(--verde-escuro); }
+
+/* Quatro leituras da mesma sala. O botão Bastidores dá espaço ao jogo quando fechado. */
+.bastidores {
+  grid-column: 2;
+  grid-row: 2;
+  width: clamp(230px, 23vw, 330px);
+  overflow: auto;
+  padding: 24px 22px;
+  background: var(--cartao);
+  border-left: 1px solid var(--borda);
+}
+.bastidores h2 { margin: 0 0 12px; font-size: 22px; }
+.bastidores dl, .bastidores dd { margin: 0; }
+.bastidores dl > div { padding: 15px 0; border-top: 1px solid var(--borda); }
+.bastidores dt { color: var(--verde-escuro); font-size: 14px; font-weight: 750; }
+.bastidores dd { margin-top: 4px; font-size: clamp(17px, 1.5vw, 22px); font-weight: 650; overflow-wrap: anywhere; }
+.bastidores .ultimo-aviso { color: var(--texto-2); font-size: 15px; font-weight: 400; }
+
+@media (max-height: 700px) and (min-width: 761px) {
+  .topo { padding-block: 8px; }
+  .palco { padding: 16px 26px 20px; }
+  .tela { gap: 14px; }
+  .relogio { width: 62px; border-width: 4px; }
+  .opcoes { min-height: min-content; gap: 12px; }
+  .opcao { padding: 10px 18px; }
+  .placar-ao-vivo { padding-block: 5px; }
+}
+
+@media (max-width: 760px) {
+  body.telao { height: auto; min-height: 100vh; overflow: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .topo { grid-row: 1; flex-wrap: wrap; gap: 8px 14px; padding: 10px 16px; }
+  .topo .marca { font-size: 20px; }
+  .info-topo { font-size: 14px; }
+  .bastidores { grid-column: 1; grid-row: 2; width: auto; padding: 12px 16px; border-left: 0; border-bottom: 1px solid var(--borda); }
+  .bastidores h2 { margin-bottom: 6px; font-size: 18px; }
+  .bastidores dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+  .bastidores dl > div { padding: 8px 0; }
+  .palco { grid-row: 3; padding: 16px; }
+  .tela { height: auto; gap: 16px; }
+  .espera-baixo, .resultado-grid { grid-template-columns: 1fr; }
+  .espera-baixo, .resultado-grid, .opcoes { gap: 12px; }
+  .convite { padding: 12px; }
+  .passo-entrada { flex-wrap: wrap; }
+  .passo-entrada + .passo-entrada { border-left: 0; padding-left: 0; }
+  .passo-texto { min-width: min(100%, 160px); }
+  .qr img { width: 96px; }
+  .opcao { padding: 12px; gap: 8px; font-size: 18px; overflow-wrap: anywhere; }
+  .rodape { flex-wrap: wrap; }
+  .podio { min-height: 200px; gap: 8px; }
+}

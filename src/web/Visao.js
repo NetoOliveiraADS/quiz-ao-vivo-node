@@ -7,18 +7,17 @@ import { estrategiasDisponiveis } from '../pontuacao/estrategias.js';
  * Monta os dados que cada tela recebe pelo evento "tela" do Socket.IO.
  * São objetos comuns do JavaScript: o Socket.IO transforma em JSON sozinho.
  *
- * O telão vê tudo (menos a resposta certa antes da hora); cada celular vê só o que é dele.
+ * O telão recebe o placar da turma. O celular acompanha seu jogador e recebe o pódio no fim.
  */
 
 export function paraTelao(partida, { podeControlar, wifi }) {
   const tela = comum(partida);
-  tela.classeEstado = partida.estado.constructor.name;
+  tela.idRodada = partida.rodada;
   tela.urlEntrada = partida.urlEntrada;
   tela.podeControlar = podeControlar;
   // A senha do Wi-Fi só vai para o telão do próprio apresentador.
   tela.wifi = podeControlar && wifi.nome ? { nome: wifi.nome, senha: wifi.senha } : null;
   tela.pontuacao = partida.pontuacao.id;
-  tela.classePontuacao = partida.pontuacao.constructor.name;
   tela.pontuacoes = estrategiasDisponiveis().map((e) => ({ id: e.id, nome: e.nome, descricao: e.descricao }));
   tela.jogadores = partida.classificacao().map(({ posicao, jogador }) => ({
     numero: jogador.numero,
@@ -36,8 +35,13 @@ export function paraTelao(partida, { podeControlar, wifi }) {
     }
   }
 
-  tela.ouvintes = resumirOuvintes(partida.nomesDosOuvintes);
-  tela.bastidores = partida.bastidores;
+  tela.bastidores = {
+    salaAbertaEm: partida.criadaEm,
+    estado: partida.estado.rotulo,
+    regra: partida.pontuacao.nome,
+    ouvintes: partida.totalOuvintes,
+    ultimoAviso: partida.ultimoAviso,
+  };
   return tela;
 }
 
@@ -98,10 +102,11 @@ function perguntaVisivel(partida) {
   return visivel ? partida.perguntaAtual : null;
 }
 
-/** Atenção: aqui NÃO vai a resposta certa. Ela só é enviada no resultado (nada de colar pelo F12). */
+/** O gabarito vai na visão do resultado, depois do fechamento da pergunta. */
 function dadosDaPergunta(partida, pergunta) {
   const aberta = partida.estado instanceof PerguntaAberta;
   return {
+    idRodada: partida.rodada,
     tipo: pergunta.tipo,
     enunciado: pergunta.enunciado,
     opcoes: [...pergunta.opcoes],
@@ -125,14 +130,4 @@ function resultadoGeral(partida, pergunta) {
     distribuicao: votos,
     acertos,
   };
-}
-
-/** "Telão, Console, 2 celulares": quem está ouvindo a Partida agora. */
-function resumirOuvintes(nomes) {
-  const celulares = nomes.filter((nome) => nome.startsWith('Celular')).length;
-  const outros = nomes.filter((nome) => !nome.startsWith('Celular'));
-  if (celulares > 0) {
-    outros.push(celulares === 1 ? '1 celular' : `${celulares} celulares`);
-  }
-  return outros.join(', ');
 }

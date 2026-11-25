@@ -9,7 +9,7 @@ import QRCode from 'qrcode';
  *   GET /telao        tela do projetor
  *   GET /qr/jogo.svg  QR code com o endereço do jogo (gerado aqui, sem internet)
  *   GET /qr/wifi.svg  QR code para entrar no Wi-Fi (só se config.json tiver o Wi-Fi)
- *   GET /estilo.css   e os outros arquivos da pasta public/
+ *   GET /css e /js    estilos e scripts das duas telas
  */
 export function configurarRotas(app, { pastaPublica, partida, wifi }) {
   app.disable('x-powered-by'); // não anuncia "Express" nas respostas
@@ -22,6 +22,7 @@ export function configurarRotas(app, { pastaPublica, partida, wifi }) {
 
   app.get('/', (req, res) => res.sendFile(path.join(pastaPublica, 'jogador.html')));
   app.get('/telao', (req, res) => res.sendFile(path.join(pastaPublica, 'telao.html')));
+  app.get('/estilo.css', (req, res) => res.redirect('/css/comum.css'));
 
   app.get('/qr/jogo.svg', async (req, res) => {
     res.type('image/svg+xml').send(await gerarQrCode(partida.urlEntrada));

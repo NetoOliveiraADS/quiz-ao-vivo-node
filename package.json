@@ -1,7 +1,7 @@
 {
   "name": "ifhoot",
   "version": "2.0.0",
-  "description": "IFhoot!: quiz em tempo real para a turma do IFCE: telão no projetor e respostas pelo celular. Trabalho de Arquitetura de Software com 3 padrões de projeto.",
+  "description": "Quiz ao vivo do IFCE com os padrões Singleton, State, Observer e Strategy.",
   "type": "module",
   "main": "servidor.js",
   "scripts": {
