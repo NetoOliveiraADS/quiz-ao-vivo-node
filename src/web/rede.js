@@ -21,19 +21,19 @@ export async function ipParaCelulares() {
 
 function ipDaRotaPadrao() {
   return new Promise((resolve, reject) => {
-    const teste = dgram.createSocket('udp4');
-    teste.once('error', (erro) => {
-      teste.close();
+    const socketDeRota = dgram.createSocket('udp4');
+    socketDeRota.once('error', (erro) => {
+      socketDeRota.close();
       reject(erro);
     });
-    teste.connect(53, '8.8.8.8', (erro) => {
+    socketDeRota.connect(53, '8.8.8.8', (erro) => {
       if (erro) {
-        teste.close();
+        socketDeRota.close();
         reject(erro);
         return;
       }
-      const { address } = teste.address();
-      teste.close();
+      const { address } = socketDeRota.address();
+      socketDeRota.close();
       resolve(address && address !== '0.0.0.0' ? address : null);
     });
   });
@@ -46,9 +46,18 @@ export function outrosIps(escolhido) {
     .map((endereco) => `${endereco.ip}  (${endereco.placa})`);
 }
 
+// Algumas máquinas permitem servir em localhost, mas restringem a consulta das placas.
+function interfacesDeRede() {
+  try {
+    return os.networkInterfaces();
+  } catch {
+    return {};
+  }
+}
+
 function listarIpv4() {
   const lista = [];
-  for (const [placa, enderecos] of Object.entries(os.networkInterfaces())) {
+  for (const [placa, enderecos] of Object.entries(interfacesDeRede())) {
     for (const endereco of enderecos ?? []) {
       // 169.254.x.x = endereço "de emergência" que o Windows usa quando não achou rede
       if (endereco.family === 'IPv4' && !endereco.internal && !endereco.address.startsWith('169.254.')) {
@@ -77,5 +86,5 @@ export function vemDesteComputador(handshake) {
   if (ip === '127.0.0.1' || ip === '::1') {
     return true;
   }
-  return Object.values(os.networkInterfaces()).flat().some((endereco) => endereco?.address === ip);
+  return Object.values(interfacesDeRede()).flat().some((endereco) => endereco?.address === ip);
 }

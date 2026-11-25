@@ -4,7 +4,7 @@ import { EstrategiaPontuacao } from './EstrategiaPontuacao.js';
 export class PontuacaoSimples extends EstrategiaPontuacao {
   id = 'simples';
   nome = 'Simples';
-  descricao = 'Todo acerto vale 1000 pontos, rápido ou não.';
+  descricao = 'Cada acerto vale 1.000 pontos.';
 
   pontosPorAcerto() {
     return 1000;

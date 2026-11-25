@@ -10,7 +10,7 @@ import { AcaoInvalida } from '../erros.js';
  *   - para qual estado ir depois.
  *
  * O JavaScript não tem "interface" como o Java. Por isso esta é uma classe base:
- * por padrão TUDO é proibido, e cada estado concreto sobrescreve só o que libera.
+ * as ações de jogo começam bloqueadas, e cada estado sobrescreve as que permite.
  */
 export class EstadoPartida {
   constructor() {

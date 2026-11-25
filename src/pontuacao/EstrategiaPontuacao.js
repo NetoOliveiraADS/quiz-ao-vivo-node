@@ -1,12 +1,7 @@
 /**
- * PADRÃO STRATEGY: a "forma" de toda regra de pontuação.
- *
- * A Partida só conhece esta classe. O apresentador escolhe a regra na sala de espera
- * e o jogo passa a pontuar de outro jeito, sem nenhum if/else na Partida.
- * Regra nova = uma subclasse nova, colocada na lista de estrategias.js.
- *
- * O JavaScript não tem "interface" como o Java, por isso usamos uma classe base.
- * Cada estratégia também tem id (usado pelo telão), nome e descricao.
+ * Strategy. Cada regra implementa pontosPorAcerto e informa id, nome e descricao.
+ * A Partida chama o mesmo método na estratégia escolhida na sala de espera.
+ * As opções do apresentador são reunidas em estrategias.js.
  */
 export class EstrategiaPontuacao {
   /** Quantos pontos vale um acerto? (Errar sempre vale zero.) */

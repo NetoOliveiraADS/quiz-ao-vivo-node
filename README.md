@@ -1,75 +1,57 @@
-# IFhoot! (Node.js + Socket.IO)
+# IFhoot!
 
-Quiz em tempo real para a turma, no estilo de jogo de auditório e com as cores do IFCE. O **telão** (projetor) mostra a pergunta, o cronômetro e o placar; cada pessoa responde pelo **celular**, no mesmo Wi-Fi do notebook.
+Quiz ao vivo para a disciplina de Arquitetura de Software do IFCE. A turma entra pelo celular, responde às perguntas e acompanha o placar no telão. O projeto demonstra **Singleton, State, Strategy e Observer**.
 
-Trabalho de **Arquitetura de Software**, com **3 padrões de projeto**: State, Observer e Strategy.
+Para apresentar em sala, abra o [roteiro de apresentação](docs/APRESENTACAO.md). Ele indica a ordem dos arquivos, os métodos para destacar, uma fala para cada classe e os passos para jogar com a turma.
 
-Tecnologias: Node.js 18+, Express 5 (páginas), Socket.IO 4 (tempo real) e `qrcode` (QR codes gerados no próprio servidor). As telas são HTML, CSS e JavaScript puro.
+## Rodar o projeto
 
-## Como rodar
+Use Node.js 18 ou superior. Na pasta que contém `package.json`, execute os comandos abaixo.
 
-1. Instale o **Node.js LTS** (https://nodejs.org).
-2. Dê dois cliques em **`iniciar.bat`** (na primeira vez ele instala as dependências). Pelo terminal: `npm install` e `npm start`.
-
-O telão abre sozinho no navegador, e o console mostra o endereço dos celulares. `npm test` joga uma partida inteira de mentira e confere as regras.
-
-> Na primeira vez, o Windows pergunta se o Node.js pode usar a rede: marque **Redes privadas e públicas** e clique em *Permitir*.
-
-## No dia: roteador do celular
-
-A rede da faculdade isola os aparelhos, então o jogo roda no **roteador (hotspot) do seu celular**:
-
-1. Ligue o roteador do celular e conecte o **notebook** nele **antes** de rodar o `iniciar.bat`.
-2. (Opcional) Copie `config.exemplo.json` para `config.json` com o nome e a senha da rede: o telão passa a mostrar também um QR code que conecta no Wi-Fi.
-3. O jogo não gasta dados móveis. O roteador do celular aceita poucos aparelhos (8 a 10): com turma grande, joguem em duplas.
-
-## Como jogar
-
-- A turma entra pelo QR code e escolhe um apelido.
-- Escolha a pontuação e aperte **Espaço**. Cada Espaço avança: pergunta → resultado → próxima → pódio.
-- A pergunta fecha sozinha quando todos respondem ou o tempo acaba.
-- **B** mostra os **Bastidores** (os padrões agindo ao vivo). **+5 robôs** cria jogadores de teste (plano B se a rede falhar). Clicar num nome na sala de espera remove a pessoa.
-- Só o notebook do servidor controla o jogo.
-
-## Os padrões de projeto
-
-| Padrão | Onde | O que faz no jogo |
-|---|---|---|
-| **State** | `src/estados/` | A partida passa por `AguardandoJogadores → PerguntaAberta → MostrandoResultado → PartidaEncerrada`. Cada estado decide o que é permitido; a `Partida` não tem `if (estado == ...)`. |
-| **Observer** | `src/observadores/` e `src/web/ConexaoSocket.js` | A `Partida` avisa todos os ouvintes a cada mudança: o telão e cada celular (pelo Socket.IO), o console e os robôs. |
-| **Strategy** | `src/pontuacao/` | Duas regras de pontuação trocáveis: Simples e Velocidade. |
-
-## Estrutura
-
-```
-servidor.js          liga tudo
-perguntas.txt        as perguntas
-public/              telas: telao.html, jogador.html, estilo.css
-teste/fluxo.mjs      teste automático (npm test)
-src/
-  Partida.js         contexto do State e do Strategy, sujeito do Observer
-  Pergunta.js        a pergunta e a leitura do perguntas.txt
-  Jogador.js, erros.js, configuracao.js
-  estados/           STATE
-  observadores/      OBSERVER
-  pontuacao/         STRATEGY
-  web/               rotas (Express), sockets (Socket.IO), ConexaoSocket, Visao, rede
+```sh
+npm ci
+npm start
 ```
 
-## Editar as perguntas
+No Windows, também é possível dar dois cliques em `iniciar.bat`. Na primeira execução, ele instala as dependências. Conecte o notebook e os celulares à mesma rede antes de ligar o servidor.
 
-Uma por linha em `perguntas.txt` (linhas com erro são ignoradas e o console avisa):
-
-```
-ME | 25 | Pergunta? | opção | *opção certa | opção | opção
-VF | 20 | Uma afirmação. | V
-```
-
-## Problemas comuns
-
-| Problema | O que fazer |
+| Quem | Onde abrir |
 |---|---|
-| O celular não abre a página | Ele está no mesmo Wi-Fi do notebook? O firewall liberou o Node.js? |
-| Endereço errado no telão | O notebook entrou no Wi-Fi depois de ligar o servidor: feche e rode de novo. |
-| "A porta 3000 já está em uso" | Feche o outro servidor ou rode `npm start -- --porta 3001`. |
-| Celular mostra "Sem conexão" | Ele reconecta sozinho e a pessoa continua com os mesmos pontos. |
+| Apresentador | No notebook que executa o servidor, abra `http://localhost:3000/telao`. O navegador abre automaticamente quando possível. |
+| Jogador | Leia o QR do telão ou digite o endereço de rede mostrado nele. Para jogar no próprio notebook, abra `http://localhost:3000/` em outra janela. |
+
+Para usar outra porta, execute `npm start -- --porta 3001`. Para escolher o momento de abrir o telão, use `npm start -- --sem-navegador`. O endereço usado aparece no terminal. Encerre com **Ctrl+C**.
+
+## Conduzir uma partida
+
+1. Cada participante escolhe um apelido. Na sala de espera, o apresentador pode clicar em um nome para removê-lo.
+2. Escolha **Simples** (1.000 por acerto) ou **Velocidade** (500 de base e até 500 de bônus por rapidez). Uma resposta errada vale zero. Clique em **Começar**.
+3. Durante a pergunta, o telão mostra quantas pessoas responderam e os três primeiros do placar. Cada resposta aceita atualiza os pontos.
+4. Quando todos respondem, o tempo termina ou o apresentador clica em **Encerrar pergunta**, aparece o gabarito, a distribuição dos votos e o placar da rodada.
+5. Avance até **Ver resultado final**. **Nova partida** zera os pontos e mantém os participantes na mesma sala.
+
+**B** abre e fecha os **Bastidores**. O painel exibe o horário de abertura da sala, a fase, a regra de pontos e o último aviso aos ouvintes. A tecla **→** avança a etapa. **Espaço** também avança quando o foco está na página. Os botões de condução funcionam no computador que executa o servidor.
+
+## Onde fica cada parte
+
+| Local | Responsabilidade |
+|---|---|
+| `servidor.js` | Lê as perguntas, obtém a partida e liga Express e Socket.IO. |
+| `src/GerenciadorPartida.js` | **Singleton**. Fornece a mesma partida durante a execução do servidor. |
+| `src/Partida.js`, `src/Jogador.js`, `src/Pergunta.js` | Regras do jogo, participantes e perguntas. |
+| `src/estados/` | **State**. Define as ações permitidas e as transições de cada fase. |
+| `src/pontuacao/` | **Strategy**. Define as duas formas de calcular os pontos. |
+| `src/observadores/`, `src/web/ConexaoSocket.js` | **Observer**. Liga as mudanças da partida ao console e às telas inscritas. |
+| `src/web/` | Páginas, QR codes, identificação da rede e mensagens entre servidor e navegadores. |
+| `public/` | HTML do telão e do jogador. Os estilos ficam em `css/` e o comportamento em `js/`. |
+
+## Perguntas e rede
+
+Edite `perguntas.txt` e reinicie o servidor. Cada linha define uma pergunta com duração entre 5 e 300 segundos. Use de duas a quatro opções para múltipla escolha e marque a correta com `*`. Para verdadeiro ou falso, termine com `V` ou `F`.
+
+```text
+ME | 25 | Qual padrão define as fases da partida? | *State | Strategy | Observer
+VF | 20 | Um acerto na regra Simples vale 1.000 pontos. | V
+```
+
+Se a rede da sala isolar os aparelhos, conecte o notebook e os celulares ao mesmo ponto de acesso móvel. O jogo funciona na rede local após a instalação. Para exibir também um QR de acesso ao Wi-Fi, copie `config.exemplo.json` para `config.json`, preencha o nome e a senha da rede que deseja apresentar e reinicie. Se os celulares não abrirem o endereço, confira a rede usada, o IP mostrado no terminal e a permissão do Node.js nessa rede.

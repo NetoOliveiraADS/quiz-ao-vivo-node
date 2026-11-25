@@ -6,7 +6,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 
 import { lerConfiguracao } from './src/configuracao.js';
-import { Partida } from './src/Partida.js';
+import { GerenciadorPartida } from './src/GerenciadorPartida.js';
 import { lerPerguntas } from './src/Pergunta.js';
 import { LogConsole } from './src/observadores/LogConsole.js';
 import { ipParaCelulares, outrosIps } from './src/web/rede.js';
@@ -16,7 +16,7 @@ import { configurarSockets } from './src/web/sockets.js';
 /*
  * Ponto de partida do IFhoot!.
  *   1. Lê a configuração e as perguntas.
- *   2. Cria a Partida e inscreve o console como ouvinte (Observer).
+ *   2. Obtém a sala do gerenciador e inscreve o console como ouvinte.
  *   3. Sobe o servidor: o Express entrega as páginas e o Socket.IO cuida do tempo real.
  *
  * Rodar: npm start        (ou: npm start -- --porta 3001 --sem-navegador)
@@ -32,10 +32,12 @@ if (perguntas.length === 0) {
   process.exit(1);
 }
 
-// 2. A partida e o primeiro ouvinte
-const partida = new Partida(perguntas);
+// 2. Singleton. Rotas e conexões recebem a mesma partida durante toda a execução.
+const gerenciador = GerenciadorPartida.obterInstancia(perguntas);
+const partida = gerenciador.partida;
 partida.inscrever(new LogConsole());
-partida.urlEntrada = `http://${await ipParaCelulares()}:${config.porta}`;
+const ipDaSala = await ipParaCelulares();
+partida.urlEntrada = `http://${ipDaSala}:${config.porta}`;
 
 // 3. Servidor: Express (páginas) e Socket.IO (tempo real) usam o MESMO servidor HTTP e a mesma porta
 const app = express();
@@ -58,8 +60,13 @@ servidorHttp.listen(config.porta, () => {
   console.log('  IFHOOT! - servidor no ar!');
   console.log('==============================================================');
   console.log(`  Telão (abra NESTE computador): ${urlTelao}`);
-  console.log(`  Celulares (mesmo Wi-Fi):       ${partida.urlEntrada}`);
-  for (const outro of outrosIps(new URL(partida.urlEntrada).hostname)) {
+  if (ipDaSala === 'localhost') {
+    console.log(`  Jogador neste computador:      ${partida.urlEntrada}`);
+    console.log('  Para conectar celulares, entre na rede da turma e reinicie o servidor.');
+  } else {
+    console.log(`  Celulares (mesmo Wi-Fi):       ${partida.urlEntrada}`);
+  }
+  for (const outro of outrosIps(ipDaSala)) {
     console.log(`  Outro IP deste computador:     ${outro}`);
   }
   console.log(`  Perguntas: ${perguntas.length}      Para desligar: Ctrl+C`);

@@ -5,148 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IFhoot! · Telão</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%232F9E41'/%3E%3Ccircle cx='14' cy='14' r='9' fill='%23C8191E' stroke='white' stroke-width='3'/%3E%3Ctext x='35' y='50' font-family='Arial' font-weight='900' font-size='42' text-anchor='middle' fill='white'%3E%3F%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="/estilo.css">
+<link rel="stylesheet" href="/css/comum.css">
 <!-- Biblioteca do Socket.IO no navegador: o próprio servidor entrega este arquivo (sem internet). -->
 <script src="/socket.io/socket.io.js"></script>
-<style>
-  body.telao {
-    height: 100vh;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-
-  /* ---------- topo ---------- */
-  .topo { grid-column: 1 / -1; display: flex; align-items: center; gap: 20px; padding: 12px 36px; }
-  .topo .marca { font-size: 26px; }
-  .info-topo { margin-left: auto; color: rgba(255, 255, 255, 0.9); font-size: 18px; font-weight: 700; }
-  .conexao-caiu { padding: 6px 12px; border-radius: 999px; background: var(--erro); border: 2px solid #fff; color: #fff; font-size: 14px; font-weight: 700; }
-  .topo #btn-bastidores[aria-pressed="true"] { background: #fff; border-color: #fff; color: var(--verde-escuro); }
-  body.so-assistindo .controle { display: none !important; }
-
-  /* ---------- palco ---------- */
-  .palco { grid-column: 1; grid-row: 2; min-width: 0; min-height: 0; padding: 22px 36px 30px; }
-  .tela { display: none; height: 100%; flex-direction: column; gap: 22px; }
-  .tela.ativa { display: flex; }
-  .tela.entrada { animation: entrar 0.45s ease both; }
-  .rodape { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--texto-2); font-size: clamp(17px, 1.5vw, 24px); font-weight: 700; }
-  .rodape strong { color: var(--texto); }
-  .rodape .botao { font-size: clamp(17px, 1.4vw, 22px); }
-
-  /* ---------- sala de espera ---------- */
-  .convite { flex: none; display: flex; gap: clamp(20px, 3vw, 40px); padding: clamp(16px, 3vh, 30px) clamp(22px, 3vw, 38px); border-radius: 28px; background: var(--cartao); border: 1px solid var(--borda); border-top: 7px solid var(--verde); box-shadow: var(--sombra); }
-  .passo-entrada { flex: 1; min-width: 0; display: flex; align-items: center; gap: clamp(16px, 2vw, 32px); }
-  .passo-entrada + .passo-entrada { padding-left: clamp(20px, 3vw, 40px); border-left: 1px solid var(--borda); }
-  .passo-texto { flex: 1; min-width: 0; container-type: inline-size; }
-  .rotulo { margin: 0; color: var(--texto-2); font-size: clamp(14px, 1.3vw, 20px); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
-  /* O endereço cabe sempre em uma linha: o tamanho acompanha a largura do cartão. */
-  .url { margin: 4px 0 10px; color: var(--verde-escuro); font-size: clamp(28px, 3.6vw, 80px); font-size: clamp(22px, 8.4cqw, 84px); font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; }
-  .dica { margin: 0; max-width: 52ch; color: var(--texto-2); font-size: clamp(14px, 1.2vw, 20px); }
-  .dica strong { color: var(--texto); }
-  .qr { flex: none; padding: 10px; border-radius: 16px; background: #fff; border: 2px solid var(--borda); line-height: 0; }
-  .qr img { display: block; width: clamp(110px, min(15vw, 21vh), 230px); height: auto; aspect-ratio: 1; }
-  /* Com o Wi-Fi configurado, os dois passos ficam um embaixo do outro: cada endereço ganha a largura toda. */
-  .convite.dois-passos { flex-direction: column; gap: 12px; }
-  .convite.dois-passos .passo-entrada + .passo-entrada { padding-left: 0; border-left: 0; padding-top: 12px; border-top: 1px solid var(--borda); }
-  .convite.dois-passos .qr { padding: 7px; border-radius: 12px; }
-  .convite.dois-passos .qr img { width: clamp(80px, min(9vw, 12.5vh), 150px); }
-  .convite.dois-passos .url { margin: 2px 0 4px; font-size: clamp(22px, 7cqw, 56px); }
-  .espera-baixo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
-  .painel { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: clamp(14px, 2.4vh, 22px) clamp(16px, 2vw, 26px); border-radius: 24px; background: var(--cartao); border: 1px solid var(--borda); }
-  .painel h2 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 20px; }
-  .contador { min-width: 34px; padding: 2px 10px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 16px; text-align: center; }
-  .chips { flex: 1; min-height: 0; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; }
-  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--verde-claro); color: var(--verde-escuro); font-size: clamp(15px, 1.2vw, 20px); font-weight: 800; animation: pop 0.35s ease both; }
-  .chip .x { color: var(--erro); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
-  .chip:hover { background: #fbe4e4; color: var(--vermelho); }
-  .chip:hover .x { opacity: 1; }
-  body.so-assistindo .chip .x { display: none; }
-  .vazio { margin: 0; color: var(--texto-2); font-size: 18px; }
-  .estrategias { display: flex; flex-wrap: wrap; gap: 8px; }
-  .estrategia { padding: 0.5em 1.05em; border-radius: 999px; background: var(--cartao-2); border: 2px solid transparent; font-size: clamp(15px, 1.1vw, 21px); font-weight: 700; white-space: nowrap; }
-  .estrategia:hover { background: var(--fundo-2); }
-  .estrategia.ativa { border-color: var(--verde); background: var(--verde-claro); color: var(--verde-escuro); }
-  .descricao-estrategia { margin: 0; min-height: 2.7em; color: var(--texto-2); font-size: clamp(14px, 1vw, 19px); line-height: 1.35; }
-  .acoes-espera { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
-  .acoes-espera button { white-space: nowrap; }
-  /* Projetor com pouca resolução: economiza espaço na sala de espera. */
-  @media (max-width: 1279px) {
-    .estrategia { padding: 0.4em 0.8em; }
-    .acoes-espera { gap: 8px; }
-  }
-
-  /* ---------- pergunta ---------- */
-  .cabeca { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .tipo { align-self: flex-start; padding: 8px 14px; border-radius: 999px; background: var(--verde-claro); color: var(--verde-escuro); font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-  .relogio { display: grid; place-items: center; width: clamp(72px, 7vw, 112px); aspect-ratio: 1; border-radius: 50%; background: var(--cartao); border: 6px solid var(--verde); box-shadow: var(--sombra); font-size: clamp(30px, 3.3vw, 54px); font-weight: 900; font-variant-numeric: tabular-nums; }
-  .relogio.urgente { border-color: var(--erro); color: var(--erro); animation: pulsar 0.5s ease-in-out infinite alternate; }
-  .enunciado { margin: 0; font-size: clamp(28px, 3.5vw, 60px); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
-  .opcoes { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 18px; }
-  .opcao { display: flex; align-items: center; gap: 18px; padding: 16px 26px; border-radius: 22px; background: var(--cor); color: var(--cor-texto); font-size: clamp(21px, 2.2vw, 38px); font-weight: 800; line-height: 1.15; box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.18); }
-  .tela.entrada .opcao { animation: entrar 0.4s ease both; }
-  .tela.entrada .opcao:nth-child(2) { animation-delay: 0.07s; }
-  .tela.entrada .opcao:nth-child(3) { animation-delay: 0.14s; }
-  .tela.entrada .opcao:nth-child(4) { animation-delay: 0.21s; }
-  .barra-tempo { flex: none; height: 12px; border-radius: 999px; overflow: hidden; background: var(--trilho); }
-  .barra-tempo div { height: 100%; transform-origin: left; background: linear-gradient(90deg, var(--verde-escuro), var(--verde)); }
-
-  /* ---------- resultado ---------- */
-  .resultado-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 26px; }
-  .resultado-grid > div { min-height: 0; display: flex; flex-direction: column; gap: 16px; }
-  .enunciado-menor { margin: 0; font-size: clamp(22px, 2.2vw, 36px); line-height: 1.2; }
-  .titulo-placar { margin: 0; font-size: 22px; }
-  .barras { display: grid; gap: 12px; }
-  .barra { position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 16px; background: var(--cartao); border: 1px solid var(--borda); font-size: clamp(18px, 1.7vw, 28px); font-weight: 700; }
-  .barra > * { position: relative; }
-  .barra .letra { background: var(--cor); color: var(--cor-texto); }
-  .barra .enche { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--cor); opacity: 0.2; transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .barra .qtd { margin-left: auto; font-variant-numeric: tabular-nums; }
-  .barra.certa { box-shadow: inset 0 0 0 3px var(--ok); }
-  .barra.certa .enche { opacity: 0.35; }
-  .barra.errada { opacity: 0.55; }
-  .placar { list-style: none; margin: 0; padding: 0; display: grid; align-content: start; gap: 10px; overflow: auto; }
-  .placar li { display: grid; grid-template-columns: 3.2ch minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; background: var(--cartao); border: 1px solid var(--borda); font-size: clamp(16px, 1.45vw, 24px); font-weight: 700; }
-  .placar li:first-child { background: var(--verde-claro); border-color: var(--verde); box-shadow: inset 0 0 0 1px var(--verde); }
-  .placar .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .placar .ganho { color: var(--ok); font-size: 0.8em; }
-  .placar .pts, .placar .pos { font-variant-numeric: tabular-nums; }
-  .placar .pos { color: var(--texto-2); }
-
-  /* ---------- final ---------- */
-  .titulo-final { margin: 0; text-align: center; font-size: clamp(30px, 3.4vw, 56px); }
-  .podio { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-end; gap: 20px; }
-  .degrau { width: min(27%, 300px); display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .degrau .nome { max-width: 100%; text-align: center; font-size: clamp(20px, 2.2vw, 38px); font-weight: 900; overflow-wrap: anywhere; }
-  .degrau .pts { color: var(--texto-2); font-size: clamp(15px, 1.3vw, 20px); font-weight: 700; }
-  .bloco { width: 100%; display: grid; justify-items: center; align-content: start; padding-top: 14px; border-radius: 18px 18px 6px 6px; color: var(--texto); font-size: clamp(30px, 3.4vw, 58px); font-weight: 900; box-shadow: inset 0 -10px 0 rgba(0, 0, 0, 0.12); transform-origin: bottom; animation: subir 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-  .p1 .bloco { height: 40vh; background: #f2b705; animation-delay: 0.5s; }
-  .p2 .bloco { height: 29vh; background: #cfd8dc; animation-delay: 0.25s; }
-  .p3 .bloco { height: 21vh; background: #d08a4e; }
-  .p1 .nome::before { content: "👑 "; }
-  @keyframes subir { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-  .resto { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; color: var(--texto-2); font-size: 17px; font-weight: 700; }
-  .resto strong { color: var(--texto); }
-
-  /* ---------- bastidores (padrões em ação) ---------- */
-  .bastidores { grid-column: 2; grid-row: 2; width: 0; overflow: hidden; background: var(--fundo-2); border-left: 1px solid var(--borda); transition: width 0.3s ease; }
-  body.com-bastidores .bastidores { width: clamp(260px, 25vw, 390px); }
-  .bastidores-dentro { width: clamp(260px, 25vw, 390px); height: 100%; display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; }
-  .bastidores h2 { margin: 0; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 18px; }
-  .bastidores h2 small { color: var(--texto-2); font-size: 13px; font-weight: 600; }
-  .resumo { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; padding: 14px; border-radius: 14px; background: var(--cartao); font-size: 13px; }
-  .resumo dt { color: var(--cor-padrao, var(--texto)); font-weight: 800; }
-  .resumo dd { margin: 0; color: var(--texto-2); font-family: ui-monospace, "Cascadia Code", Consolas, monospace; overflow-wrap: anywhere; }
-  .log { flex: 1; min-height: 0; overflow: auto; list-style: none; margin: 0; padding: 0; display: grid; align-content: start; gap: 8px; }
-  .log li { display: grid; gap: 3px; padding: 9px 12px; border-radius: 12px; background: var(--cartao); border-left: 4px solid var(--cor-padrao, var(--texto-2)); font-size: 13px; line-height: 1.35; }
-  .log li.novo { animation: entrar 0.35s ease both; }
-  .log .cab { display: flex; justify-content: space-between; gap: 8px; }
-  .log .padrao { color: var(--cor-padrao); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-  .log .hora { color: var(--texto-2); font-size: 11px; font-variant-numeric: tabular-nums; }
-  .pad-state { --cor-padrao: #6b4fbb; }
-  .pad-observer { --cor-padrao: #00796b; }
-  .pad-strategy { --cor-padrao: #946200; }
-</style>
+<link rel="stylesheet" href="/css/telao.css">
 </head>
 <body class="telao">
 
@@ -154,7 +16,7 @@
   <div class="marca"><span class="logo" aria-hidden="true">?</span> IFhoot!</div>
   <div class="info-topo" id="info-topo"></div>
   <span class="conexao-caiu" id="conexao" hidden>Reconectando…</span>
-  <button class="botao-sec" id="btn-bastidores" title="Atalho: B">Bastidores</button>
+  <button class="botao-sec" id="btn-bastidores" aria-controls="bastidores" aria-expanded="false" title="Atalho: B">Bastidores</button>
 </header>
 
 <main class="palco">
@@ -170,11 +32,11 @@
         </div>
       </div>
       <div class="passo-entrada">
-        <div class="qr"><img id="qr-jogo" alt="QR code para abrir o quiz"></div>
+        <div class="qr" id="convite-qr"><img id="qr-jogo" alt="QR code para abrir o quiz"></div>
         <div class="passo-texto">
           <p class="rotulo" id="rotulo-jogo">Entre pelo celular</p>
           <p class="url" id="url-entrada">…</p>
-          <p class="dica">Aponte a câmera para o QR code ou digite o endereço no navegador.</p>
+          <p class="dica" id="dica-entrada"></p>
         </div>
       </div>
     </div>
@@ -189,7 +51,6 @@
         <div class="estrategias" id="estrategias"></div>
         <p class="descricao-estrategia" id="descricao-estrategia"></p>
         <div class="acoes-espera">
-          <button class="botao-sec controle" id="btn-robos" title="Adiciona 5 jogadores de teste que respondem sozinhos">+5 robôs</button>
           <button class="botao controle" id="btn-comecar" title="Atalho: Espaço">Começar ▶</button>
         </div>
       </div>
@@ -205,6 +66,10 @@
     <h1 class="enunciado" id="p-enunciado"></h1>
     <div class="opcoes" id="p-opcoes"></div>
     <div class="barra-tempo"><div id="p-barra"></div></div>
+    <section class="placar-ao-vivo" aria-labelledby="titulo-ao-vivo">
+      <h2 id="titulo-ao-vivo">Placar ao vivo</h2>
+      <ol id="p-placar"></ol>
+    </section>
     <div class="rodape">
       <span id="p-respondidas"></span>
       <button class="botao controle" id="btn-encerrar" title="Atalho: Espaço">Encerrar pergunta ▶</button>
@@ -242,267 +107,18 @@
   </section>
 </main>
 
-<aside class="bastidores" aria-label="Bastidores: padrões em ação">
-  <div class="bastidores-dentro">
-    <h2>Bastidores <small>padrões em ação</small></h2>
-    <dl class="resumo">
-      <dt class="pad-state">State</dt><dd id="b-estado"></dd>
-      <dt class="pad-observer">Observer</dt><dd id="b-ouvintes"></dd>
-      <dt class="pad-strategy">Strategy</dt><dd id="b-estrategia"></dd>
-    </dl>
-    <ol class="log" id="b-log"></ol>
-  </div>
+<aside class="bastidores" id="bastidores" aria-labelledby="titulo-bastidores" hidden>
+  <h2 id="titulo-bastidores">Bastidores</h2>
+  <dl>
+    <div><dt>Singleton</dt><dd id="b-sala"></dd></div>
+    <div><dt>State</dt><dd id="b-estado"></dd></div>
+    <div><dt>Strategy</dt><dd id="b-estrategia"></dd></div>
+    <div><dt>Observer</dt><dd id="b-ouvintes"></dd><dd class="ultimo-aviso" id="b-aviso" aria-live="polite"></dd></div>
+  </dl>
 </aside>
 
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 
-<script>
-'use strict';
-const $ = (id) => document.getElementById(id);
-// Escapa o texto antes de colocar no HTML: um apelido como "<script>" vira texto, não código.
-const esc = (texto) => String(texto ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmt = (n) => Number(n).toLocaleString('pt-BR');
-const LETRAS = ['A', 'B', 'C', 'D'];
-const TIPOS = { ME: 'Múltipla escolha', VF: 'Verdadeiro ou falso' };
-
-let d = null;                 // o último retrato da partida enviado pelo servidor
-let telaAnterior = '';
-let prazo = 0, duracao = 1;
-let urlDoQr = '', assinaturaFinal = '', ultimoAvanco = 0;
-const logVisto = new Set();
-
-/* ===== Socket.IO: o telão é um OBSERVER da partida =====
-   "auth" diz ao servidor quem somos. O servidor responde com o evento "tela"
-   toda vez que algo muda. Se a conexão cair, o Socket.IO reconecta sozinho. */
-const socket = io({ auth: { tipo: 'telao' } });
-// Só aparece um aviso quando a conexão cai; enquanto tudo funciona, o topo fica limpo.
-socket.on('connect', () => { $('conexao').hidden = true; });
-socket.on('disconnect', () => { $('conexao').hidden = false; });
-socket.on('connect_error', () => { $('conexao').hidden = false; });
-socket.on('tela', (dados) => {
-  d = dados;
-  desenhar();
-});
-
-function desenhar() {
-  const tela = d.estado + ':' + d.rodada;
-  const nova = tela !== telaAnterior;
-  telaAnterior = tela;
-  document.body.classList.toggle('so-assistindo', !d.podeControlar);
-  document.querySelectorAll('.tela').forEach((el) => el.classList.toggle('ativa', el.id === 'tela-' + d.estado));
-  if (nova) reanimar($('tela-' + d.estado));
-
-  const emJogo = d.estado === 'PERGUNTA' || d.estado === 'RESULTADO';
-  $('info-topo').textContent = emJogo ? `Pergunta ${d.rodada} de ${d.totalRodadas}` : `${d.totalRodadas} perguntas`;
-
-  if (d.estado === 'AGUARDANDO') desenharEspera();
-  else if (d.estado === 'PERGUNTA') desenharPergunta(nova);
-  else if (d.estado === 'RESULTADO') desenharResultado(nova);
-  else desenharFinal(nova);
-  desenharBastidores();
-}
-
-function reanimar(el) {
-  el.classList.remove('entrada');
-  void el.offsetWidth; // reinicia a animação de entrada
-  el.classList.add('entrada');
-}
-
-/* ----- 1. sala de espera ----- */
-function desenharEspera() {
-  const comWifi = Boolean(d.wifi);
-  $('convite').classList.toggle('dois-passos', comWifi);
-  $('passo-wifi').hidden = !comWifi;
-  if (comWifi) {
-    $('wifi-nome').textContent = d.wifi.nome;
-    $('wifi-senha').innerHTML = d.wifi.senha ? `Senha: <strong>${esc(d.wifi.senha)}</strong>` : 'Rede aberta, sem senha';
-    if (!$('qr-wifi').getAttribute('src')) $('qr-wifi').src = '/qr/wifi.svg';
-  }
-  $('rotulo-jogo').textContent = comWifi ? '2. Abra o quiz' : 'Entre pelo celular';
-  $('url-entrada').textContent = d.urlEntrada.replace(/^https?:\/\//, '');
-  if (urlDoQr !== d.urlEntrada) { // o endereço mudou (ou é a primeira vez): pede um QR code novo
-    urlDoQr = d.urlEntrada;
-    $('qr-jogo').src = '/qr/jogo.svg?v=' + encodeURIComponent(d.urlEntrada);
-  }
-  $('qtd-jogadores').textContent = d.jogadores.length;
-  $('sem-jogadores').hidden = d.jogadores.length > 0;
-  sincronizarChips(d.jogadores);
-  $('estrategias').innerHTML = d.pontuacoes.map((e) =>
-    `<button class="estrategia ${e.id === d.pontuacao ? 'ativa' : ''}" data-id="${esc(e.id)}">${esc(e.nome)}</button>`).join('');
-  const ativa = d.pontuacoes.find((e) => e.id === d.pontuacao);
-  $('descricao-estrategia').textContent = ativa ? ativa.descricao : '';
-  $('btn-comecar').disabled = d.jogadores.length === 0;
-}
-
-/* Só acrescenta/remove os nomes que mudaram, para não "piscar" a lista inteira. */
-function sincronizarChips(jogadores) {
-  const caixa = $('chips');
-  const existentes = new Map([...caixa.children].map((el) => [el.dataset.numero, el]));
-  const vistos = new Set();
-  for (const j of jogadores) {
-    const chave = String(j.numero);
-    vistos.add(chave);
-    if (existentes.has(chave)) continue;
-    const chip = document.createElement('button');
-    chip.className = 'chip';
-    chip.dataset.numero = chave;
-    chip.dataset.nome = j.nome;
-    chip.innerHTML = `<span>${esc(j.nome)}</span><span class="x" aria-hidden="true">✕</span>`;
-    caixa.appendChild(chip);
-  }
-  existentes.forEach((el, chave) => { if (!vistos.has(chave)) el.remove(); });
-}
-
-/* ----- 2. pergunta aberta ----- */
-function desenharPergunta(nova) {
-  const p = d.pergunta;
-  if (nova) {
-    $('p-tipo').textContent = TIPOS[p.tipo];
-    $('p-enunciado').textContent = p.enunciado;
-    $('p-opcoes').innerHTML = p.opcoes.map((o, i) => `<div class="opcao op-${i}"><span class="letra">${LETRAS[i]}</span><span>${esc(o)}</span></div>`).join('');
-    duracao = p.tempoTotalMs || 1;
-    prazo = performance.now() + p.restanteMs;
-  }
-  $('p-respondidas').innerHTML = `<strong>${d.respondidas}</strong> de ${d.totalJogadores} responderam`;
-}
-
-/* O cronômetro roda no navegador, a partir do "restanteMs" que o servidor mandou. */
-function relogio() {
-  if (d && d.estado === 'PERGUNTA') {
-    const resta = Math.max(0, prazo - performance.now());
-    const segundos = Math.ceil(resta / 1000);
-    $('p-tempo').textContent = segundos;
-    $('p-barra').style.transform = `scaleX(${resta / duracao})`;
-    $('relogio').classList.toggle('urgente', segundos <= 5);
-  }
-  requestAnimationFrame(relogio);
-}
-requestAnimationFrame(relogio);
-
-/* ----- 3. resultado ----- */
-function desenharResultado(nova) {
-  const p = d.pergunta;
-  const r = d.resultado;
-  if (nova) {
-    $('r-tipo').textContent = TIPOS[p.tipo];
-    $('r-enunciado').textContent = p.enunciado;
-    const maior = Math.max(1, ...r.distribuicao);
-    $('r-respostas').innerHTML = '<div class="barras">' + p.opcoes.map((o, i) => {
-      const certa = i === r.indiceCorreto;
-      return `<div class="barra op-${i} ${certa ? 'certa' : 'errada'}">
-        <span class="enche" data-largura="${(r.distribuicao[i] / maior) * 100}"></span>
-        <span class="letra">${certa ? '✓' : LETRAS[i]}</span>
-        <span>${esc(o)}</span>
-        <span class="qtd">${r.distribuicao[i]}</span>
-      </div>`;
-    }).join('') + '</div>';
-    // anima as barras crescendo
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      document.querySelectorAll('#r-respostas .enche').forEach((el) => { el.style.width = el.dataset.largura + '%'; });
-    }));
-  }
-  $('r-acertos').innerHTML = `<strong>${r.acertos}</strong> de ${d.totalJogadores} acertaram`;
-  $('r-placar').innerHTML = d.jogadores.slice(0, 6).map((j) => `
-    <li>
-      <span class="pos">${j.posicao}º</span>
-      <span class="nome">${esc(j.nome)}</span>
-      <span class="ganho">${j.ultimosPontos ? '+' + fmt(j.ultimosPontos) : ''}</span>
-      <span class="pts">${fmt(j.pontos)}</span>
-    </li>`).join('');
-  $('btn-proxima').textContent = d.rodada < d.totalRodadas ? 'Próxima pergunta ▶' : 'Ver resultado final 🏆';
-}
-
-/* ----- 4. fim de jogo ----- */
-function desenharFinal(nova) {
-  const assinatura = JSON.stringify(d.jogadores);
-  if (!nova && assinatura === assinaturaFinal) return; // nada mudou: não reinicia a animação do pódio
-  assinaturaFinal = assinatura;
-  const top = d.jogadores.slice(0, 3);
-  const ordemNoPodio = [1, 0, 2]; // 2º, 1º, 3º
-  $('podio').innerHTML = ordemNoPodio.filter((i) => top[i]).map((i) => `
-    <div class="degrau p${i + 1}">
-      <span class="nome">${esc(top[i].nome)}</span>
-      <span class="pts">${fmt(top[i].pontos)} pts</span>
-      <div class="bloco">${top[i].posicao}º</div>
-    </div>`).join('');
-  const resto = d.jogadores.slice(3);
-  $('resto').innerHTML = resto.map((j) => `<li>${j.posicao}º <strong>${esc(j.nome)}</strong> · ${fmt(j.pontos)}</li>`).join('');
-  $('resto').hidden = resto.length === 0;
-}
-
-/* ----- painel Bastidores: os padrões agindo ao vivo ----- */
-function desenharBastidores() {
-  $('b-estado').textContent = d.classeEstado;
-  $('b-ouvintes').textContent = `${d.ouvintes} ouvintes inscritos`;
-  $('b-estrategia').textContent = d.classePontuacao;
-  $('b-log').innerHTML = d.bastidores.map((b) => {
-    const chave = b.hora + b.padrao + b.texto;
-    const novo = !logVisto.has(chave);
-    logVisto.add(chave);
-    const classe = 'pad-' + b.padrao.toLowerCase().replace(/\s+/g, '-');
-    return `<li class="${classe}${novo ? ' novo' : ''}">
-      <div class="cab"><span class="padrao">${esc(b.padrao)}</span><span class="hora">${esc(b.hora)}</span></div>
-      <span>${esc(b.texto)}</span>
-    </li>`;
-  }).join('');
-}
-
-/* ===== Ações do apresentador =====
-   emit('apresentador', pedido, callback): o callback é o "acknowledgement", a resposta
-   do servidor a ESTE pedido. timeout(5000) desiste se o servidor não responder. */
-function acao(nome, extra = {}) {
-  socket.timeout(5000).emit('apresentador', { acao: nome, ...extra }, (semResposta, r) => {
-    if (semResposta) avisar('O servidor não respondeu.');
-    else if (!r.ok) avisar(r.erro);
-  });
-}
-
-function avancar() {
-  const agora = Date.now();
-  if (agora - ultimoAvanco < 700) return; // evita pular uma tela com clique duplo
-  ultimoAvanco = agora;
-  acao('avancar');
-}
-
-['btn-comecar', 'btn-encerrar', 'btn-proxima', 'btn-nova'].forEach((id) => { $(id).onclick = avancar; });
-$('btn-robos').onclick = () => acao('robos');
-$('estrategias').onclick = (e) => {
-  const botao = e.target.closest('.estrategia');
-  if (botao) acao('pontuacao', { valor: botao.dataset.id });
-};
-$('chips').onclick = (e) => {
-  const chip = e.target.closest('.chip');
-  if (chip && d.podeControlar && confirm(`Remover "${chip.dataset.nome}" da partida?`)) {
-    acao('remover', { numero: chip.dataset.numero });
-  }
-};
-$('btn-bastidores').onclick = () => alternarBastidores();
-
-// Depois de um clique, tira o foco do botão: assim o Espaço não "clica" nele de novo.
-document.addEventListener('click', (e) => { const botao = e.target.closest('button'); if (botao) botao.blur(); });
-document.addEventListener('keydown', (e) => {
-  if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
-  if (e.code === 'Space' || e.code === 'Enter' || e.code === 'ArrowRight') { e.preventDefault(); avancar(); }
-  else if (e.code === 'KeyB') alternarBastidores();
-});
-
-function alternarBastidores(ligar) {
-  const ligado = document.body.classList.toggle('com-bastidores', ligar);
-  $('btn-bastidores').setAttribute('aria-pressed', String(ligado));
-}
-// Em telas estreitas (projetor antigo), o painel começa fechado para sobrar espaço.
-alternarBastidores(innerWidth >= 1200);
-
-let avisoTimer = null;
-function avisar(mensagem, tipo = 'erro') {
-  const el = $('aviso');
-  el.textContent = mensagem;
-  el.dataset.tipo = tipo;
-  el.classList.add('visivel');
-  clearTimeout(avisoTimer);
-  avisoTimer = setTimeout(() => el.classList.remove('visivel'), 3200);
-}
-
-</script>
+<script type="module" src="/js/telao.js"></script>
 </body>
 </html>

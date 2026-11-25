@@ -15,4 +15,4 @@ VF | 20 | Observer é um padrão criacional. | F
 ME | 25 | No IFhoot!, qual padrão troca a regra de pontos? | State | *Strategy | Singleton | Facade
 VF | 20 | O State muda o comportamento conforme o estado. | V
 ME | 25 | Qual padrão avisa vários objetos quando algo muda? | Strategy | State | Adapter | *Observer
-ME | 25 | Quantos padrões o IFhoot! usa? | 2 | *3 | 4 | 5
+ME | 25 | Quantos padrões de projeto a equipe demonstra no IFhoot!? | 2 | 3 | *4 | 5

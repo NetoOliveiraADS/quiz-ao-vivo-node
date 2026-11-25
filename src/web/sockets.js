@@ -35,7 +35,7 @@ export function configurarSockets(io, partida, { wifi }) {
         if (ehTelao) {
           throw new AcaoInvalida('O telão não joga.');
         }
-        const jogador = partida.entrar(apelido);
+        const jogador = partida.buscar(conexao.idJogador) ?? partida.entrar(apelido);
         conexao.vincularJogador(jogador.id);
         conexao.enviarTela();
         return { id: jogador.id, nome: jogador.nome };
@@ -47,7 +47,7 @@ export function configurarSockets(io, partida, { wifi }) {
         if (!conexao.idJogador) {
           throw new AcaoInvalida('Entre na partida primeiro.');
         }
-        partida.responder(conexao.idJogador, resposta);
+        partida.responder(conexao.idJogador, resposta?.valor ?? resposta, resposta?.idRodada);
       });
     });
 
@@ -70,6 +70,11 @@ export function configurarSockets(io, partida, { wifi }) {
 function executarAcaoDoApresentador(partida, pedido) {
   switch (pedido?.acao) {
     case 'avancar':
+      // A última resposta pode ter fechado a pergunta enquanto o apresentador clicava.
+      if (pedido.estado !== undefined &&
+          (pedido.estado !== partida.estado.nome || pedido.idRodada !== partida.rodada)) {
+        return;
+      }
       partida.avancar();
       break;
     case 'pontuacao':

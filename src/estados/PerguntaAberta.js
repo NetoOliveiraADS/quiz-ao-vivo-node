@@ -1,3 +1,4 @@
+import { AcaoInvalida } from '../erros.js';
 import { EstadoPartida } from './EstadoPartida.js';
 import { MostrandoResultado } from './MostrandoResultado.js';
 
@@ -8,6 +9,8 @@ import { MostrandoResultado } from './MostrandoResultado.js';
  * ou quando o apresentador avança.
  */
 export class PerguntaAberta extends EstadoPartida {
+  rotulo = 'Pergunta aberta';
+
   get nome() {
     return 'PERGUNTA';
   }
@@ -17,6 +20,10 @@ export class PerguntaAberta extends EstadoPartida {
   }
 
   responder(partida, jogador, resposta) {
+    if (partida.restanteMs === 0) {
+      this.#fecharPergunta(partida);
+      throw new AcaoInvalida('O tempo desta pergunta acabou.');
+    }
     partida.registrarResposta(jogador, resposta);
     if (partida.todosResponderam()) {
       this.#fecharPergunta(partida);
@@ -33,7 +40,7 @@ export class PerguntaAberta extends EstadoPartida {
   }
 
   #fecharPergunta(partida) {
-    partida.pontuarRodada();
+    partida.fecharRodada();
     partida.mudarEstado(new MostrandoResultado());
   }
 }

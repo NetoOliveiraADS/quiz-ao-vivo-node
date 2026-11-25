@@ -7,6 +7,8 @@ import { EstadoPartida } from './EstadoPartida.js';
  * Não pode: entrar nem responder.
  */
 export class PartidaEncerrada extends EstadoPartida {
+  rotulo = 'Fim da partida';
+
   get nome() {
     return 'ENCERRADA';
   }

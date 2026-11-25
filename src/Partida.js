@@ -6,21 +6,12 @@ import { PontuacaoVelocidade } from './pontuacao/PontuacaoVelocidade.js';
 import { estrategiasDisponiveis } from './pontuacao/estrategias.js';
 
 /**
- * A partida: o coração do jogo. Os três padrões se encontram aqui:
- *
- *  - STATE (contexto): guarda o estado atual e repassa cada ação para ele.
- *    Quem decide se a ação é permitida é o estado, não a Partida.
- *  - OBSERVER (sujeito): guarda a lista de ouvintes e avisa todos a cada mudança.
- *  - STRATEGY (contexto): usa uma regra de pontuação que pode ser trocada.
- *
- * Os campos que começam com # são PRIVADOS: só o código desta classe mexe neles.
- *
- * Não precisa de "synchronized" como no Java: o Node.js trata um evento de cada vez
- * (o "event loop"), então duas respostas nunca são processadas ao mesmo tempo.
+ * O gerenciador mantém esta sala. A Partida delega ações ao estado, calcula os pontos
+ * com a estratégia escolhida e publica cada mudança para os ouvintes inscritos.
  */
 export class Partida {
   #estado = new AguardandoJogadores();  // STATE
-  #ouvintes = [];                       // OBSERVER
+  #ouvintes = new Set();                // OBSERVER
   #pontuacao = new PontuacaoVelocidade(); // STRATEGY
 
   #perguntas;
@@ -31,20 +22,24 @@ export class Partida {
   #inicioDaPerguntaMs = 0;
   #rodada = 0;              // muda a cada pergunta; ignora cronômetros atrasados
   #cronometro = null;
-  #bastidores = [];         // linhas do painel Bastidores do telão
+  #criadaEm = Date.now();
+  #ultimoAviso = '';
   urlEntrada = '';          // endereço que os celulares abrem
 
   constructor(perguntas) {
     this.#perguntas = [...perguntas];
   }
 
-  // ═══════════ Ações que chegam das telas: cada uma é repassada ao ESTADO atual ═══════════
+  // Ações enviadas pelas telas.
 
   entrar(apelido) {
     return this.#estado.entrar(this, limparApelido(apelido));
   }
 
-  responder(idJogador, resposta) {
+  responder(idJogador, resposta, rodada = this.#rodada) {
+    if (rodada !== this.#rodada) {
+      throw new AcaoInvalida('Esta resposta pertence a uma pergunta anterior.');
+    }
     const jogador = this.buscar(idJogador);
     if (!jogador) {
       throw new AcaoInvalida('Jogador não encontrado. Entre de novo.');
@@ -75,23 +70,22 @@ export class Partida {
     this.#notificar(`${alvo.nome} foi removido`);
   }
 
-  // ═══════════════════════════════════ OBSERVER ═══════════════════════════════════
+  // Observer. Inscrições e publicação de mudanças.
 
   inscrever(ouvinte) {
-    this.#ouvintes.push(ouvinte);
+    this.#ouvintes.add(ouvinte);
     this.#notificar(`${ouvinte.descricao()} conectou`);
   }
 
   cancelarInscricao(ouvinte) {
-    const posicao = this.#ouvintes.indexOf(ouvinte);
-    if (posicao !== -1) {
-      this.#ouvintes.splice(posicao, 1);
+    if (this.#ouvintes.delete(ouvinte)) {
       this.#notificar(`${ouvinte.descricao()} saiu`);
     }
   }
 
   /** Avisa TODOS os ouvintes, com uma frase do que mudou. A Partida não sabe se é o telão, um celular ou o console. */
   #notificar(mensagem) {
+    this.#ultimoAviso = mensagem;
     // Percorre uma CÓPIA da lista: um ouvinte pode sair dela durante o aviso.
     for (const ouvinte of [...this.#ouvintes]) {
       try {
@@ -102,7 +96,7 @@ export class Partida {
     }
   }
 
-  // ═══════════ Operações usadas pelos ESTADOS (são eles que decidem QUANDO chamar) ═══════════
+  // Operações que os estados usam para conduzir a partida.
 
   adicionarJogador(apelido) {
     for (const existente of this.#jogadores.values()) {
@@ -118,7 +112,6 @@ export class Partida {
 
   definirPontuacao(nova) {
     this.#pontuacao = nova;
-    this.#registrarBastidor('Strategy', `Regra trocada para ${nova.constructor.name}`);
     this.#notificar(`Pontuação: ${nova.nome}`);
   }
 
@@ -126,7 +119,7 @@ export class Partida {
     clearTimeout(this.#cronometro);
     this.#indicePergunta = indice;
     this.#respostas.clear();
-    this.#inicioDaPerguntaMs = Date.now();
+    this.#inicioDaPerguntaMs = performance.now();
     const estaRodada = ++this.#rodada;
     // setTimeout agenda o fim do tempo sem travar o servidor.
     this.#cronometro = setTimeout(() => {
@@ -142,11 +135,11 @@ export class Partida {
     }
     const pergunta = this.perguntaAtual;
     pergunta.validar(valor);
-    this.#respostas.set(jogador, Object.freeze({
-      valor,
-      tempoMs: Date.now() - this.#inicioDaPerguntaMs,
-      correta: pergunta.estaCorreta(valor),
-    }));
+    const tempoMs = performance.now() - this.#inicioDaPerguntaMs;
+    const correta = pergunta.estaCorreta(valor);
+    const pontos = correta ? this.#pontuacao.pontosPorAcerto(tempoMs, pergunta.tempoLimiteMs) : 0;
+    this.#respostas.set(jogador, Object.freeze({ valor, correta }));
+    jogador.registrarRodada(pontos);
     this.#notificar(`${jogador.nome} respondeu (${this.#respostas.size}/${this.#jogadores.size})`);
   }
 
@@ -154,25 +147,12 @@ export class Partida {
     return this.#respostas.size >= this.#jogadores.size;
   }
 
-  /** Usa a ESTRATÉGIA de pontuação atual para dar os pontos da pergunta que acabou. */
-  pontuarRodada() {
+  /** Quem já respondeu já recebeu os pontos. Registra a ausência dos demais. */
+  fecharRodada() {
     clearTimeout(this.#cronometro);
-    let acertos = 0;
-    let distribuidos = 0;
     for (const jogador of this.#jogadores.values()) {
-      const resposta = this.#respostas.get(jogador);
-      let pontos = 0;
-      if (resposta?.correta) {
-        pontos = this.#pontuacao.pontosPorAcerto(resposta.tempoMs, this.perguntaAtual.tempoLimiteMs);
-        acertos++;
-        distribuidos += pontos;
-      }
-      jogador.registrarRodada(pontos);
+      if (!this.#respostas.has(jogador)) jogador.registrarRodada(0);
     }
-    const regra = this.#pontuacao.constructor.name;
-    this.#registrarBastidor('Strategy', acertos === 0
-      ? `${regra}: ninguém acertou`
-      : `${regra}: ${distribuidos.toLocaleString('pt-BR')} pontos para ${acertos} ${acertos === 1 ? 'acerto' : 'acertos'}`);
   }
 
   temProximaPergunta() {
@@ -181,13 +161,8 @@ export class Partida {
 
   /** A troca de estado em si. Quem chama são os próprios estados. */
   mudarEstado(novo) {
-    const de = this.#estado.constructor.name;
-    const para = novo.constructor.name;
     this.#estado = novo;
-    // O painel mostra o mais novo em cima: primeiro o aviso, depois a troca (que fica no topo).
-    this.#registrarBastidor('Observer', `${this.#ouvintes.length} ouvintes avisados`);
-    this.#registrarBastidor('State', `${de} → ${para}`);
-    this.#notificar(`${de} → ${para}`);
+    this.#notificar(`Fase: ${novo.rotulo}`);
   }
 
   zerarPlacar() {
@@ -197,7 +172,7 @@ export class Partida {
     this.#indicePergunta = -1;
   }
 
-  // ═══════════════════════════ consultas (para as telas) ═══════════════════════════
+  // Consultas usadas para montar as telas.
 
   get estado() { return this.#estado; }
   get pontuacao() { return this.#pontuacao; }
@@ -207,8 +182,9 @@ export class Partida {
   get totalPerguntas() { return this.#perguntas.length; }
   get rodada() { return this.#rodada; }
   get respostas() { return [...this.#respostas.values()]; }
-  get nomesDosOuvintes() { return this.#ouvintes.map((o) => o.descricao()); }
-  get bastidores() { return [...this.#bastidores]; }
+  get totalOuvintes() { return this.#ouvintes.size; }
+  get ultimoAviso() { return this.#ultimoAviso; }
+  get criadaEm() { return this.#criadaEm; }
 
   buscar(id) {
     return (typeof id === 'string' && this.#jogadores.get(id)) || null;
@@ -220,7 +196,7 @@ export class Partida {
 
   get restanteMs() {
     const pergunta = this.perguntaAtual;
-    return pergunta ? Math.max(0, this.#inicioDaPerguntaMs + pergunta.tempoLimiteMs - Date.now()) : 0;
+    return pergunta ? Math.max(0, this.#inicioDaPerguntaMs + pergunta.tempoLimiteMs - performance.now()) : 0;
   }
 
   /** Placar ordenado. Empate divide a posição (1º, 2º, 2º, 4º...). */
@@ -232,13 +208,6 @@ export class Partida {
       lista.push({ posicao: empatado ? lista[i - 1].posicao : i + 1, jogador });
     });
     return lista;
-  }
-
-  /** Uma linha do painel Bastidores: qual padrão agiu e o que fez (guarda as 14 últimas). */
-  #registrarBastidor(padrao, texto) {
-    const hora = new Date().toLocaleTimeString('pt-BR');
-    this.#bastidores.unshift({ hora, padrao, texto });
-    this.#bastidores.length = Math.min(this.#bastidores.length, 14);
   }
 }
 
