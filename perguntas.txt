@@ -1,15 +1,3 @@
-# ==================================================================
-#  PERGUNTAS DO IFHOOT!
-#  Uma pergunta por linha, com os campos separados por |
-#
-#     ME | SEGUNDOS | PERGUNTA | opção | *opção certa | opção | opção
-#     VF | SEGUNDOS | AFIRMAÇÃO | V ou F
-#
-#  ME = múltipla escolha (2 a 4 opções, a certa marcada com *)
-#  VF = verdadeiro ou falso
-#  Linhas que começam com # são ignoradas.
-# ==================================================================
-
 ME | 25 | Qual padrão garante uma única instância? | Factory Method | *Singleton | Observer | Adapter
 VF | 20 | Observer é um padrão criacional. | F
 ME | 25 | No IFhoot!, qual padrão troca a regra de pontos? | State | *Strategy | Singleton | Facade

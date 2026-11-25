@@ -57,21 +57,8 @@ servidorHttp.listen(config.porta, () => {
   const urlTelao = `http://localhost:${config.porta}/telao`;
   console.log('');
   console.log('==============================================================');
-  console.log('  IFHOOT! - servidor no ar!');
+  console.log('  IFHOOT! - servidor on!');
   console.log('==============================================================');
-  console.log(`  Telão (abra NESTE computador): ${urlTelao}`);
-  if (ipDaSala === 'localhost') {
-    console.log(`  Jogador neste computador:      ${partida.urlEntrada}`);
-    console.log('  Para conectar celulares, entre na rede da turma e reinicie o servidor.');
-  } else {
-    console.log(`  Celulares (mesmo Wi-Fi):       ${partida.urlEntrada}`);
-  }
-  for (const outro of outrosIps(ipDaSala)) {
-    console.log(`  Outro IP deste computador:     ${outro}`);
-  }
-  console.log(`  Perguntas: ${perguntas.length}      Para desligar: Ctrl+C`);
-  console.log('==============================================================');
-  console.log('');
   if (config.abrirNavegador) {
     const comando = process.platform === 'win32' ? `start "" "${urlTelao}"` : `xdg-open "${urlTelao}"`;
     exec(comando, (erro) => erro && console.log(`Abra o telão manualmente: ${urlTelao}`));
