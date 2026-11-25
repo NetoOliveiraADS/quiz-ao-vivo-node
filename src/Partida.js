@@ -7,11 +7,11 @@ import { estrategiasDisponiveis } from './pontuacao/estrategias.js';
 
 /**
  * O gerenciador mantém esta sala. A Partida delega ações ao estado, calcula os pontos
- * com a estratégia escolhida e publica cada mudança para os ouvintes inscritos.
+ * com a estratégia escolhida e publica cada mudança para os observadores inscritos.
  */
 export class Partida {
   #estado = new AguardandoJogadores();  // STATE
-  #ouvintes = new Set();                // OBSERVER
+  #observadores = new Set();                // OBSERVER
   #pontuacao = new PontuacaoVelocidade(); // STRATEGY
 
   #perguntas;
@@ -72,26 +72,26 @@ export class Partida {
 
   // Observer. Inscrições e publicação de mudanças.
 
-  inscrever(ouvinte) {
-    this.#ouvintes.add(ouvinte);
-    this.#notificar(`${ouvinte.descricao()} conectou`);
+  inscrever(observador) {
+    this.#observadores.add(observador);
+    this.#notificar(`${observador.descricao()} conectou`);
   }
 
-  cancelarInscricao(ouvinte) {
-    if (this.#ouvintes.delete(ouvinte)) {
-      this.#notificar(`${ouvinte.descricao()} saiu`);
+  cancelarInscricao(observador) {
+    if (this.#observadores.delete(observador)) {
+      this.#notificar(`${observador.descricao()} saiu`);
     }
   }
 
-  /** Avisa TODOS os ouvintes, com uma frase do que mudou. A Partida não sabe se é o telão, um celular ou o console. */
+  /** Avisa TODOS os observadores, com uma frase do que mudou. A Partida não sabe se é o telão, um celular ou o console. */
   #notificar(mensagem) {
     this.#ultimoAviso = mensagem;
-    // Percorre uma CÓPIA da lista: um ouvinte pode sair dela durante o aviso.
-    for (const ouvinte of [...this.#ouvintes]) {
+    // Percorre uma CÓPIA da lista: um observador pode sair dela durante o aviso.
+    for (const observador of [...this.#observadores]) {
       try {
-        ouvinte.atualizar(mensagem);
+        observador.atualizar(mensagem);
       } catch (erro) {
-        console.error(`Erro no ouvinte ${ouvinte.descricao()}:`, erro);
+        console.error(`Erro no observador ${observador.descricao()}:`, erro);
       }
     }
   }
@@ -182,7 +182,9 @@ export class Partida {
   get totalPerguntas() { return this.#perguntas.length; }
   get rodada() { return this.#rodada; }
   get respostas() { return [...this.#respostas.values()]; }
-  get totalOuvintes() { return this.#ouvintes.size; }
+  get tiposDeObservadores() {
+    return Array.from(this.#observadores, (observador) => observador.tipo);
+  }
   get ultimoAviso() { return this.#ultimoAviso; }
   get criadaEm() { return this.#criadaEm; }
 

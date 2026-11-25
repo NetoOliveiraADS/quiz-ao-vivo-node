@@ -16,7 +16,7 @@ import { configurarSockets } from './src/web/sockets.js';
 /*
  * Ponto de partida do IFhoot!.
  *   1. Lê a configuração e as perguntas.
- *   2. Obtém a sala do gerenciador e inscreve o console como ouvinte.
+ *   2. Obtém a sala do gerenciador e inscreve o console como observador.
  *   3. Sobe o servidor: o Express entrega as páginas e o Socket.IO cuida do tempo real.
  *
  * Rodar: npm start        (ou: npm start -- --porta 3001 --sem-navegador)

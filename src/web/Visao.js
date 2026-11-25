@@ -10,6 +10,9 @@ import { estrategiasDisponiveis } from '../pontuacao/estrategias.js';
  * O telão recebe o placar da turma. O celular acompanha seu jogador e recebe o pódio no fim.
  */
 
+const listaEmPortugues = new Intl.ListFormat('pt-BR');
+const pluraisDosObservadores = { console: 'consoles', telão: 'telões', celular: 'celulares', outro: 'outros' };
+
 export function paraTelao(partida, { podeControlar, wifi }) {
   const tela = comum(partida);
   tela.idRodada = partida.rodada;
@@ -35,14 +38,33 @@ export function paraTelao(partida, { podeControlar, wifi }) {
     }
   }
 
-  tela.bastidores = {
+  tela.padroes = {
     salaAbertaEm: partida.criadaEm,
     estado: partida.estado.rotulo,
     regra: partida.pontuacao.nome,
-    ouvintes: partida.totalOuvintes,
+    observadores: descreverObservadores(partida.tiposDeObservadores),
     ultimoAviso: partida.ultimoAviso,
   };
   return tela;
+}
+
+function descreverObservadores(tipos) {
+  const total = tipos.length;
+  if (total === 0) return '0 observadores';
+
+  const quantidades = new Map();
+  for (const tipo of tipos) {
+    const grupo = Object.hasOwn(pluraisDosObservadores, tipo) ? tipo : 'outro';
+    quantidades.set(grupo, (quantidades.get(grupo) ?? 0) + 1);
+  }
+
+  const grupos = [];
+  for (const [tipo, plural] of Object.entries(pluraisDosObservadores)) {
+    const quantidade = quantidades.get(tipo);
+    if (quantidade) grupos.push(quantidade === 1 ? tipo : `${quantidade} ${plural}`);
+  }
+  const rotulo = total === 1 ? 'observador' : 'observadores';
+  return `${total} ${rotulo} (${listaEmPortugues.format(grupos)})`;
 }
 
 export function paraJogador(partida, idJogador) {

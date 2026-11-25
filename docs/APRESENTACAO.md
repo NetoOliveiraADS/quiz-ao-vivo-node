@@ -22,7 +22,7 @@
 |---|---|---|
 | [Pergunta.js](../src/Pergunta.js) | `lerPerguntas`, `validar` e `estaCorreta` | “Cada linha de `perguntas.txt` vira uma `Pergunta`. Ela guarda enunciado, opções, tempo e índice correto. Primeiro verifico se a opção existe. Depois verifico se ela corresponde ao gabarito. Uma alternativa válida pode estar errada e valer zero.” |
 | [Jogador.js](../src/Jogador.js) | `constructor`, `registrarRodada` e `zerar` | “O apelido aparece no telão. O identificador guardado pelo celular permite retomar o mesmo participante. O jogador mantém o total e o ganho da última rodada. Um acerto de mil acrescenta mil ao total, e esse mesmo ganho aparece no resultado.” |
-| [Partida.js](../src/Partida.js) | Campos `#estado`, `#pontuacao`, `#ouvintes`, `#jogadores` e `#respostas` | “A partida reúne as perguntas, os jogadores e as respostas da rodada. Um mapa encontra o participante pelo identificador. Outro guarda a resposta que ele já deu. O sinal de cerquilha indica que o campo é privado. Agora vou mostrar quais decisões essa classe delega.” |
+| [Partida.js](../src/Partida.js) | Campos `#estado`, `#pontuacao`, `#observadores`, `#jogadores` e `#respostas` | “A partida reúne as perguntas, os jogadores e as respostas da rodada. Um mapa encontra o participante pelo identificador. Outro guarda a resposta que ele já deu. O sinal de cerquilha indica que o campo é privado. Agora vou mostrar quais decisões essa classe delega.” |
 
 ### 3. Singleton · Quem fornece a partida?
 
@@ -65,9 +65,9 @@
 
 ### 6. Observer · Como o telão descobre que alguém respondeu?
 
-**Abra** [OuvintePartida.js](../src/observadores/OuvintePartida.js), [LogConsole.js](../src/observadores/LogConsole.js) e [ConexaoSocket.js](../src/web/ConexaoSocket.js). Em [Partida.js](../src/Partida.js), destaque `inscrever`, `#notificar` e `cancelarInscricao`.
+**Abra** [ObservadorPartida.js](../src/observadores/ObservadorPartida.js), [LogConsole.js](../src/observadores/LogConsole.js) e [ConexaoSocket.js](../src/web/ConexaoSocket.js). Em [Partida.js](../src/Partida.js), destaque `inscrever`, `#notificar` e `cancelarInscricao`.
 
-> A `Partida` é o objeto observado. Ela mantém um conjunto de ouvintes. O contrato `OuvintePartida` diz que um ouvinte recebe `atualizar(mensagem)`. O primeiro exemplo concreto é `LogConsole`: ao ser avisado, escreve a mensagem no terminal.
+> A `Partida` é o objeto observado. Ela mantém um conjunto de observadores. O contrato `ObservadorPartida` diz que um observador recebe `atualizar(mensagem)`. O primeiro exemplo concreto é `LogConsole`: ao ser avisado, escreve a mensagem no terminal.
 >
 > O segundo é `ConexaoSocket`. Cada telão ou celular conectado ganha um desses objetos no servidor. Quando uma resposta foi aceita e os pontos já foram creditados, `#notificar` percorre os inscritos. A conexão agenda um envio para cerca de 30 milissegundos depois. Se chegar outro aviso nesse intervalo, ela aproveita o envio já marcado e as duas mudanças aparecem juntas na tela.
 >
@@ -81,7 +81,7 @@
 2. Em [sockets.js](../src/web/sockets.js), ache `socket.on('responder'`. **Fala sugerida** — “A conexão identifica a Ana e chama `partida.responder` na sala obtida do Singleton.”
 3. Em [PerguntaAberta.js](../src/estados/PerguntaAberta.js), ache `responder`. **Fala sugerida** — “O State permite a jogada enquanto há tempo. A partida registra uma única resposta dessa pessoa e usa a Strategy para creditar um acerto.”
 4. Em [Visao.js](../src/web/Visao.js), ache `paraTelao` e `paraJogador`. **Fala sugerida** — “Quando o Observer avisa a conexão, ela monta os dados do destinatário. O telão recebe a classificação da turma. O celular recebe seus pontos e a confirmação da escolha. O gabarito vai no resultado.”
-5. Em [telao.js](../public/js/telao.js), ache `socket.on('tela'`, `desenharPergunta` e `desenharBastidores`. **Fala sugerida** — “O telão redesenha o contador e os três primeiros do placar. Se era a última resposta, a tela já pode mostrar o resultado, porque os avisos próximos são agrupados.”
+5. Em [telao.js](../public/js/telao.js), ache `socket.on('tela'`, `desenharPergunta` e `desenharPainelPadroes`. **Fala sugerida** — “O telão redesenha o contador e os três primeiros do placar. Se era a última resposta, a tela já pode mostrar o resultado, porque os avisos próximos são agrupados.”
 
 As páginas [telao.html](../public/telao.html) e [jogador.html](../public/jogador.html) definem os elementos que serão projetados ou tocados. [interface.js](../public/js/interface.js) reúne a formatação dos pontos e o tratamento do texto exibido. Se pedirem a infraestrutura, mostre [rotas.js](../src/web/rotas.js) para as páginas e QR codes, [rede.js](../src/web/rede.js) para o endereço de entrada e [configuracao.js](../src/configuracao.js) para a porta e o Wi-Fi opcional.
 
@@ -94,7 +94,7 @@ Antes da aula, instale as dependências com `npm ci` na pasta do projeto. Conect
 | Momento | O que fazer | O que mostrar ou dizer |
 |---|---|---|
 | Abrir a sala | No terminal, rode `npm start`. Projete `http://localhost:3000/telao`. | Aponte para o QR e para o endereço alternativo. Convide duas pessoas a entrar, cada uma com um apelido. Com duas, a primeira resposta continua visível enquanto a segunda pessoa pensa. |
-| Situar a turma | Clique em **Bastidores** ou pressione **B**. Escolha **Simples** na sala de espera. | Mostre o horário da sala em Singleton, a fase em State e a regra em Strategy. Em Observer, o número inclui o console e as telas conectadas. Com um telão, dois celulares e o console, são quatro ouvintes. |
+| Situar a turma | Clique em **Padrões em ação** ou pressione **B**. Escolha **Simples** na sala de espera. | “O console e o telão já recebem os avisos desde o começo. Por isso aparece ‘2 observadores (console e telão)’. Quando vocês abrem o quiz em dois celulares, lemos ‘4 observadores (console, telão e 2 celulares)’. O apelido só entra na lista de jogadores depois de tocar em Entrar.” |
 | Começar | Clique em **Começar**. Peça à primeira pessoa que responda e à segunda que aguarde alguns segundos. | Aponte para “1 de 2 responderam”, o último aviso e o placar ao vivo. Se a primeira pessoa acertar, os 1.000 pontos aparecem com a pergunta ainda aberta. Se errar, o contador avança e o total fica igual. |
 | Revelar o resultado | Peça a resposta da segunda pessoa. | O estado muda sozinho. Mostre a alternativa correta, a quantidade de votos e o total de cada participante. No celular, quem acertou vê o ganho. Os mesmos pontos continuam no placar. |
 | Concluir o jogo | Clique em **Próxima pergunta** ou pressione **→**. Joguem as demais. Também é possível usar **Encerrar pergunta** ou aguardar o cronômetro. Após a última, escolha **Ver resultado final**. | Mostre o pódio e a posição no celular. O empate de pontos divide a colocação. |
