@@ -30,7 +30,9 @@ Para usar outra porta, execute `npm start -- --porta 3001`. Para escolher o mome
 4. Quando todos respondem, o tempo termina ou o apresentador clica em **Encerrar pergunta**, aparece o gabarito, a distribuição dos votos e o placar da rodada.
 5. Avance até **Ver resultado final**. **Nova partida** zera os pontos e mantém os participantes na mesma sala.
 
-**B** abre e fecha os **Bastidores**. O painel exibe o horário de abertura da sala, a fase, a regra de pontos e o último aviso aos ouvintes. A tecla **→** avança a etapa. **Espaço** também avança quando o foco está na página. Os botões de condução funcionam no computador que executa o servidor.
+Clique em **Padrões em ação** ou pressione **B** para ver a sala, a fase, a regra de pontos e o último aviso. Ao abrir só o telão, a linha **Observer** mostra **2 observadores (console e telão)**. Cada celular que abre o quiz também recebe os avisos e entra nessa contagem. O apelido entra na lista de jogadores quando a pessoa toca em **Entrar**.
+
+A tecla **→** avança a etapa. **Espaço** também avança quando o foco está na página. Os botões de condução funcionam no computador que executa o servidor.
 
 ## Onde fica cada parte
 

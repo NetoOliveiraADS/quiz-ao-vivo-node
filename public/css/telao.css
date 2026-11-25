@@ -11,7 +11,7 @@ body.telao {
 .topo .marca { font-size: 26px; }
 .info-topo { margin-left: auto; color: rgba(255, 255, 255, 0.9); font-size: 18px; font-weight: 700; }
 .conexao-caiu { padding: 6px 12px; border-radius: 999px; background: var(--erro); border: 2px solid #fff; color: #fff; font-size: 14px; font-weight: 700; }
-.topo #btn-bastidores[aria-expanded="true"] { background: #fff; border-color: #fff; color: var(--verde-escuro); }
+.topo #btn-padroes[aria-expanded="true"] { background: #fff; border-color: #fff; color: var(--verde-escuro); }
 body.so-assistindo .controle { display: none !important; }
 
 /* ---------- palco ---------- */
@@ -137,8 +137,8 @@ body.so-assistindo .chip .x { display: none; }
 .placar-ao-vivo li { display: flex; gap: 7px; font-variant-numeric: tabular-nums; }
 .placar-ao-vivo strong { color: var(--verde-escuro); }
 
-/* Quatro leituras da mesma sala. O botão Bastidores dá espaço ao jogo quando fechado. */
-.bastidores {
+/* Quatro leituras da mesma sala. O botão Padrões em ação dá espaço ao jogo quando fechado. */
+.painel-padroes {
   grid-column: 2;
   grid-row: 2;
   width: clamp(230px, 23vw, 330px);
@@ -147,12 +147,12 @@ body.so-assistindo .chip .x { display: none; }
   background: var(--cartao);
   border-left: 1px solid var(--borda);
 }
-.bastidores h2 { margin: 0 0 12px; font-size: 22px; }
-.bastidores dl, .bastidores dd { margin: 0; }
-.bastidores dl > div { padding: 15px 0; border-top: 1px solid var(--borda); }
-.bastidores dt { color: var(--verde-escuro); font-size: 14px; font-weight: 750; }
-.bastidores dd { margin-top: 4px; font-size: clamp(17px, 1.5vw, 22px); font-weight: 650; overflow-wrap: anywhere; }
-.bastidores .ultimo-aviso { color: var(--texto-2); font-size: 15px; font-weight: 400; }
+.painel-padroes h2 { margin: 0 0 12px; font-size: 22px; }
+.painel-padroes dl, .painel-padroes dd { margin: 0; }
+.painel-padroes dl > div { padding: 15px 0; border-top: 1px solid var(--borda); }
+.painel-padroes dt { color: var(--verde-escuro); font-size: 14px; font-weight: 750; }
+.painel-padroes dd { margin-top: 4px; font-size: clamp(17px, 1.5vw, 22px); font-weight: 650; overflow-wrap: anywhere; }
+.painel-padroes .ultimo-aviso { color: var(--texto-2); font-size: 15px; font-weight: 400; }
 
 @media (max-height: 700px) and (min-width: 761px) {
   .topo { padding-block: 8px; }
@@ -169,10 +169,10 @@ body.so-assistindo .chip .x { display: none; }
   .topo { grid-row: 1; flex-wrap: wrap; gap: 8px 14px; padding: 10px 16px; }
   .topo .marca { font-size: 20px; }
   .info-topo { font-size: 14px; }
-  .bastidores { grid-column: 1; grid-row: 2; width: auto; padding: 12px 16px; border-left: 0; border-bottom: 1px solid var(--borda); }
-  .bastidores h2 { margin-bottom: 6px; font-size: 18px; }
-  .bastidores dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
-  .bastidores dl > div { padding: 8px 0; }
+  .painel-padroes { grid-column: 1; grid-row: 2; width: auto; padding: 12px 16px; border-left: 0; border-bottom: 1px solid var(--borda); }
+  .painel-padroes h2 { margin-bottom: 6px; font-size: 18px; }
+  .painel-padroes dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+  .painel-padroes dl > div { padding: 8px 0; }
   .palco { grid-row: 3; padding: 16px; }
   .tela { height: auto; gap: 16px; }
   .espera-baixo, .resultado-grid { grid-template-columns: 1fr; }

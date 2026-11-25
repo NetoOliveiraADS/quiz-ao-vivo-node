@@ -35,7 +35,7 @@ function desenhar() {
   else if (dados.estado === 'PERGUNTA') desenharPergunta(nova);
   else if (dados.estado === 'RESULTADO') desenharResultado(nova);
   else desenharFinal(nova);
-  desenharBastidores();
+  desenharPainelPadroes();
 }
 
 function reanimar(el) {
@@ -173,15 +173,15 @@ function desenharFinal(nova) {
   porId('resto').hidden = resto.length === 0;
 }
 
-/* ----- painel Bastidores: os padrões agindo ao vivo ----- */
-function desenharBastidores() {
-  const { salaAbertaEm, estado, regra, ouvintes, ultimoAviso } = dados.bastidores;
+/* Painel Padrões em ação. */
+function desenharPainelPadroes() {
+  const { salaAbertaEm, estado, regra, observadores, ultimoAviso } = dados.padroes;
   const hora = new Date(salaAbertaEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  porId('b-sala').textContent = `Sala aberta às ${hora}`;
-  porId('b-estado').textContent = estado;
-  porId('b-estrategia').textContent = regra;
-  porId('b-ouvintes').textContent = `${ouvintes} ${ouvintes === 1 ? 'ouvinte' : 'ouvintes'}`;
-  porId('b-aviso').textContent = ultimoAviso;
+  porId('padroes-sala').textContent = `Sala aberta às ${hora}`;
+  porId('padroes-estado').textContent = estado;
+  porId('padroes-estrategia').textContent = regra;
+  porId('padroes-observadores').textContent = observadores;
+  porId('padroes-aviso').textContent = ultimoAviso;
 }
 
 /* ===== Ações do apresentador =====
@@ -216,11 +216,11 @@ porId('chips').onclick = (e) => {
     acao('remover', { numero: chip.dataset.numero });
   }
 };
-porId('btn-bastidores').onclick = alternarBastidores;
+porId('btn-padroes').onclick = alternarPainelPadroes;
 
 document.addEventListener('keydown', (e) => {
   if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
-  if (e.code === 'KeyB') alternarBastidores();
+  if (e.code === 'KeyB') alternarPainelPadroes();
   if (!dados?.podeControlar || !socket.connected) return;
   if (e.target.closest('button') && e.code !== 'ArrowRight') return;
   if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) {
@@ -229,10 +229,10 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function alternarBastidores() {
-  const painel = porId('bastidores');
+function alternarPainelPadroes() {
+  const painel = porId('painel-padroes');
   painel.hidden = !painel.hidden;
-  porId('btn-bastidores').setAttribute('aria-expanded', String(!painel.hidden));
+  porId('btn-padroes').setAttribute('aria-expanded', String(!painel.hidden));
 }
 
 let avisoTimer = null;

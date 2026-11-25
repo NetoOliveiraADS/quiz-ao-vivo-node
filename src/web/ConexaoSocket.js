@@ -1,4 +1,4 @@
-import { OuvintePartida } from '../observadores/OuvintePartida.js';
+import { ObservadorPartida } from '../observadores/ObservadorPartida.js';
 import { paraJogador, paraTelao } from './Visao.js';
 
 // Vários avisos chegam quase juntos (ex.: 20 respostas no mesmo segundo).
@@ -8,11 +8,11 @@ const ESPERA_PARA_JUNTAR_MS = 30;
 /**
  * OBSERVER concreto: uma tela conectada pelo Socket.IO (o telão ou um celular).
  *
- * Cada navegador que abre o jogo vira um ouvinte da Partida. Quando a Partida
+ * Cada navegador que abre o jogo vira um observador da Partida. Quando a Partida
  * avisa que algo mudou, esta classe monta a tela atualizada (Visao.js) e manda
  * pelo evento "tela" só para ESTE navegador (socket.emit).
  */
-export class ConexaoSocket extends OuvintePartida {
+export class ConexaoSocket extends ObservadorPartida {
   #partida;
   #socket;
   #ehTelao;
@@ -37,6 +37,10 @@ export class ConexaoSocket extends OuvintePartida {
 
   get podeControlar() {
     return this.#podeControlar;
+  }
+
+  get tipo() {
+    return this.#ehTelao ? 'telão' : 'celular';
   }
 
   /** Depois que a pessoa entra com um apelido, esta conexão passa a representar o jogador dela. */
