@@ -1,4 +1,4 @@
-import { AcaoInvalida } from '../erros.js';
+import { AcaoInvalida } from '../jogo/AcaoInvalida.js';
 
 /**
  * PADRÃO STATE: a classe base de todos os estados da partida.

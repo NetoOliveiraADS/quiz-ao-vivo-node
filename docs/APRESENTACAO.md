@@ -6,13 +6,13 @@
 
 ### 1. Apresentar a ideia e o ponto de entrada
 
-**Abra** [servidor.js](../servidor.js). Mostre, na ordem, `lerPerguntas`, `GerenciadorPartida.obterInstancia`, `partida.inscrever`, `configurarRotas` e `configurarSockets`.
+**Abra** [servidor.js](../servidor.js). A única linha carrega [iniciarServidor.js](../src/aplicacao/iniciarServidor.js). Abra esse segundo arquivo e mostre, na ordem, `lerPerguntas`, `GerenciadorPartida.obterInstancia`, `partida.inscrever`, `configurarRotas` e `configurarSockets`.
 
 **Fala sugerida**
 
 > O IFhoot! é um quiz ao vivo inspirado no Kahoot!. O professor projeta uma pergunta e cada participante responde pelo próprio celular. Se duas pessoas responderem quase juntas, elas precisam estar disputando a mesma pergunta, com o mesmo cronômetro e a mesma regra de pontos. É esse problema que organizou o projeto.
 >
-> Aqui é onde tudo começa. O servidor lê as perguntas de um arquivo de texto, obtém a sala do gerenciador e registra o console para acompanhar as mudanças. O Express entrega as páginas. O Socket.IO mantém a comunicação com elas durante o jogo. Reparem que a variável `partida` leva a mesma referência para as duas partes.
+> Na pasta `aplicacao` eu mostro como o programa começa. Na pasta `jogo` eu mostro as regras da partida. Aqui o servidor lê as perguntas de um arquivo de texto, obtém a sala do gerenciador e registra o console para acompanhar as mudanças. O Express entrega as páginas. O Socket.IO mantém a comunicação com elas durante o jogo. Reparem que a variável `partida` leva a mesma referência para as duas partes.
 >
 > O trabalho pede pelo menos três padrões de projeto. Neste jogo usamos quatro. Singleton resolve quem fornece a sala, State decide o que pode acontecer em cada fase, Strategy calcula os pontos e Observer comunica o que mudou.
 
@@ -20,13 +20,13 @@
 
 | Abra no editor | Trecho para destacar | Fala sugerida |
 |---|---|---|
-| [Pergunta.js](../src/Pergunta.js) | `lerPerguntas`, `validar` e `estaCorreta` | “Cada linha de `perguntas.txt` vira uma `Pergunta`. Ela guarda enunciado, opções, tempo e índice correto. Primeiro verifico se a opção existe. Depois verifico se ela corresponde ao gabarito. Uma alternativa válida pode estar errada e valer zero.” |
-| [Jogador.js](../src/Jogador.js) | `constructor`, `registrarRodada` e `zerar` | “O apelido aparece no telão. O identificador guardado pelo celular permite retomar o mesmo participante. O jogador mantém o total e o ganho da última rodada. Um acerto de mil acrescenta mil ao total, e esse mesmo ganho aparece no resultado.” |
-| [Partida.js](../src/Partida.js) | Campos `#estado`, `#pontuacao`, `#observadores`, `#jogadores` e `#respostas` | “A partida reúne as perguntas, os jogadores e as respostas da rodada. Um mapa encontra o participante pelo identificador. Outro guarda a resposta que ele já deu. O sinal de cerquilha indica que o campo é privado. Agora vou mostrar quais decisões essa classe delega.” |
+| [lerPerguntas.js](../src/aplicacao/lerPerguntas.js) e [Pergunta.js](../src/jogo/Pergunta.js) | `lerPerguntas` no primeiro arquivo. `validar` e `estaCorreta` no segundo. | “O leitor transforma cada linha válida de `perguntas.txt` em uma `Pergunta`. A classe guarda enunciado, opções, tempo e índice correto. Primeiro verifico se a opção existe. Depois verifico se ela corresponde ao gabarito. Uma alternativa válida pode estar errada e valer zero.” |
+| [Jogador.js](../src/jogo/Jogador.js) | `constructor`, `registrarRodada` e `zerar` | “O apelido aparece no telão. O identificador guardado pelo celular permite retomar o mesmo participante. O jogador mantém o total e o ganho da última rodada. Um acerto de mil acrescenta mil ao total, e esse mesmo ganho aparece no resultado.” |
+| [Partida.js](../src/jogo/Partida.js) | Campos `#estado`, `#pontuacao`, `#observadores`, `#jogadores` e `#respostas` | “A partida reúne as perguntas, os jogadores e as respostas da rodada. Um mapa encontra o participante pelo identificador. Outro guarda a resposta que ele já deu. O sinal de cerquilha indica que o campo é privado. Agora vou mostrar quais decisões essa classe delega.” |
 
 ### 3. Singleton · Quem fornece a partida?
 
-**Abra** [GerenciadorPartida.js](../src/GerenciadorPartida.js). Aponte para `static #instancia`, `obterInstancia`, `constructor` e `get partida`. Volte à linha em `servidor.js` que lê `gerenciador.partida`.
+**Abra** [GerenciadorPartida.js](../src/jogo/GerenciadorPartida.js). Aponte para `static #instancia`, `obterInstancia`, `constructor` e `get partida`. Volte à linha em `iniciarServidor.js` que lê `gerenciador.partida`.
 
 > Imaginem que cada conexão criasse sua própria sala. O celular da Ana somaria pontos em uma partida e o projetor consultaria outra. O gerenciador existe para fornecer uma referência comum.
 >
@@ -36,7 +36,7 @@
 
 ### 4. State · Por que o mesmo botão faz coisas diferentes?
 
-**Comece por** [Partida.js](../src/Partida.js), em `avancar()`. Mostre a chamada `this.#estado.avancar(this)`. Abra [EstadoPartida.js](../src/estados/EstadoPartida.js) e depois percorra as quatro subclasses na ordem abaixo.
+**Comece por** [Partida.js](../src/jogo/Partida.js), em `avancar()`. Mostre a chamada `this.#estado.avancar(this)`. Abra [EstadoPartida.js](../src/estados/EstadoPartida.js) e depois percorra as quatro subclasses na ordem abaixo.
 
 > Quando o apresentador avança, a partida entrega o pedido ao estado atual. O `this` passado como argumento é a própria partida. Assim, o estado consegue abrir a pergunta ou trocar de fase. A classe base `EstadoPartida` define as operações comuns e a resposta para uma ação indisponível. Cada subclasse implementa o comportamento da sua fase.
 
@@ -47,11 +47,11 @@
 | [MostrandoResultado](../src/estados/MostrandoResultado.js) · `avancar` | “A turma vê o gabarito e o placar. Se ainda houver uma pergunta, o avanço abre a próxima e volta a `PerguntaAberta`. Depois da última, ele leva ao fim da partida. Quem entra nesta fase começa a disputar a pergunta seguinte.” |
 | [PartidaEncerrada](../src/estados/PartidaEncerrada.js) · `avancar` | “O telão exibe o pódio. Agora o mesmo comando representa ‘Nova partida’. Ele limpa as respostas, zera os pontos e devolve os mesmos jogadores à sala de espera.” |
 
-**Mostre um limite concreto.** Em [erros.js](../src/erros.js), a classe `AcaoInvalida` representa um pedido que a regra do jogo impede. Na sala de espera, `responder` herda a implementação da classe base. Em [sockets.js](../src/web/sockets.js), `tratar` converte essa exceção em uma mensagem para a pessoa que fez o pedido.
+**Mostre um limite concreto.** Em [AcaoInvalida.js](../src/jogo/AcaoInvalida.js), a classe `AcaoInvalida` representa um pedido que a regra do jogo impede. Na sala de espera, `responder` herda a implementação da classe base. Em [sockets.js](../src/web/sockets.js), `tratar` converte essa exceção em uma mensagem para a pessoa que fez o pedido.
 
 ### 5. Strategy · Quanto vale a mesma resposta?
 
-**Abra, nesta ordem**, [EstrategiaPontuacao.js](../src/pontuacao/EstrategiaPontuacao.js), [PontuacaoSimples.js](../src/pontuacao/PontuacaoSimples.js), [PontuacaoVelocidade.js](../src/pontuacao/PontuacaoVelocidade.js) e [estrategias.js](../src/pontuacao/estrategias.js). Termine em [Partida.js](../src/Partida.js), no método `registrarResposta`.
+**Abra, nesta ordem**, [EstrategiaPontuacao.js](../src/pontuacao/EstrategiaPontuacao.js), [PontuacaoSimples.js](../src/pontuacao/PontuacaoSimples.js), [PontuacaoVelocidade.js](../src/pontuacao/PontuacaoVelocidade.js) e [estrategias.js](../src/pontuacao/estrategias.js). Termine em [Partida.js](../src/jogo/Partida.js), no método `registrarResposta`.
 
 > As duas regras dizem quantos pontos vale um acerto. O contrato `EstrategiaPontuacao` define o método `pontosPorAcerto`. `PontuacaoSimples` devolve mil. `PontuacaoVelocidade` parte de 500 e acrescenta até 500 de bônus, conforme a fração de tempo que sobrou. O relógio usado para esse cálculo é o do servidor.
 
@@ -65,7 +65,7 @@
 
 ### 6. Observer · Como o telão descobre que alguém respondeu?
 
-**Abra** [ObservadorPartida.js](../src/observadores/ObservadorPartida.js), [LogConsole.js](../src/observadores/LogConsole.js) e [ConexaoSocket.js](../src/web/ConexaoSocket.js). Em [Partida.js](../src/Partida.js), destaque `inscrever`, `#notificar` e `cancelarInscricao`.
+**Abra** [ObservadorPartida.js](../src/observadores/ObservadorPartida.js), [LogConsole.js](../src/observadores/LogConsole.js) e [ConexaoSocket.js](../src/web/ConexaoSocket.js). Em [Partida.js](../src/jogo/Partida.js), destaque `inscrever`, `#notificar` e `cancelarInscricao`.
 
 > A `Partida` é o objeto observado. Ela mantém um conjunto de observadores. O contrato `ObservadorPartida` diz que um observador recebe `atualizar(mensagem)`. O primeiro exemplo concreto é `LogConsole`: ao ser avisado, escreve a mensagem no terminal.
 >
@@ -83,7 +83,7 @@
 4. Em [Visao.js](../src/web/Visao.js), ache `paraTelao` e `paraJogador`. **Fala sugerida** — “Quando o Observer avisa a conexão, ela monta os dados do destinatário. O telão recebe a classificação da turma. O celular recebe seus pontos e a confirmação da escolha. O gabarito vai no resultado.”
 5. Em [telao.js](../public/js/telao.js), ache `socket.on('tela'`, `desenharPergunta` e `desenharPainelPadroes`. **Fala sugerida** — “O telão redesenha o contador e os três primeiros do placar. Se era a última resposta, a tela já pode mostrar o resultado, porque os avisos próximos são agrupados.”
 
-As páginas [telao.html](../public/telao.html) e [jogador.html](../public/jogador.html) definem os elementos que serão projetados ou tocados. [interface.js](../public/js/interface.js) reúne a formatação dos pontos e o tratamento do texto exibido. Se pedirem a infraestrutura, mostre [rotas.js](../src/web/rotas.js) para as páginas e QR codes, [rede.js](../src/web/rede.js) para o endereço de entrada e [configuracao.js](../src/configuracao.js) para a porta e o Wi-Fi opcional.
+As páginas [telao.html](../public/telao.html) e [jogador.html](../public/jogador.html) definem os elementos que serão projetados ou tocados. [interface.js](../public/js/interface.js) reúne a formatação dos pontos e o tratamento do texto exibido. Se pedirem a infraestrutura, mostre [rotas.js](../src/web/rotas.js) para as páginas e QR codes, [rede.js](../src/web/rede.js) para o endereço de entrada e [configuracao.js](../src/aplicacao/configuracao.js) para a porta e o Wi-Fi opcional.
 
 **Para passar do código ao jogo**, diga “Agora que vimos o caminho de uma resposta no código, vamos acompanhar esse mesmo caminho jogando.”
 

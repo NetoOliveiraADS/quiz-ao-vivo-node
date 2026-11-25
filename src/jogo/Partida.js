@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { AcaoInvalida } from './erros.js';
+import { AcaoInvalida } from './AcaoInvalida.js';
 import { Jogador } from './Jogador.js';
-import { AguardandoJogadores } from './estados/AguardandoJogadores.js';
-import { PontuacaoVelocidade } from './pontuacao/PontuacaoVelocidade.js';
-import { estrategiasDisponiveis } from './pontuacao/estrategias.js';
+import { AguardandoJogadores } from '../estados/AguardandoJogadores.js';
+import { PontuacaoVelocidade } from '../pontuacao/PontuacaoVelocidade.js';
+import { estrategiasDisponiveis } from '../pontuacao/estrategias.js';
 
 /**
  * O gerenciador mantém esta sala. A Partida delega ações ao estado, calcula os pontos
