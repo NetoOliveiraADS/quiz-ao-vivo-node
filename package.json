@@ -1,0 +1,20 @@
+{
+  "name": "ifhoot",
+  "version": "2.0.0",
+  "description": "IFhoot!: quiz em tempo real para a turma do IFCE: telão no projetor e respostas pelo celular. Trabalho de Arquitetura de Software com 3 padrões de projeto.",
+  "type": "module",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js",
+    "dev": "node --watch servidor.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.3.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.4"
+  }
+}

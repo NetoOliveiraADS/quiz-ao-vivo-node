@@ -1,0 +1,7 @@
+{
+  "porta": 3000,
+  "wifi": {
+    "nome": "NOME_DA_REDE",
+    "senha": "SENHA_DA_REDE"
+  }
+}

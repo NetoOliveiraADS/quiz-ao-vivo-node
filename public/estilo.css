@@ -1,0 +1,111 @@
+/* Estilo compartilhado entre o telão e o celular: as cores do IFCE (verde e vermelho dos Institutos Federais). */
+:root {
+  --verde: #2f9e41;
+  --verde-escuro: #1e7a31;
+  --verde-claro: #e3f2e5;
+  --vermelho: #c8191e;
+  --fundo: #f3f6f2;
+  --fundo-2: #e9efe8;
+  --cartao: #ffffff;
+  --cartao-2: #eef3ed;
+  --borda: #d3ddd2;
+  --trilho: #dce5db;
+  --texto: #15261a;
+  --texto-2: #4d5f51;
+  --destaque: var(--verde);
+  --ok: var(--verde-escuro);
+  --erro: var(--vermelho);
+  /* alternativas A, B, C, D: cor do fundo e cor do texto em cima dela */
+  --op-0: #2f9e41; --op-0-texto: #fff;
+  --op-1: #c8191e; --op-1-texto: #fff;
+  --op-2: #f0a500; --op-2-texto: #2a1d00;
+  --op-3: #34495e; --op-3-texto: #fff;
+  --sombra: 0 10px 28px rgba(21, 38, 26, 0.12);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  color: var(--texto);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  background:
+    radial-gradient(1000px 560px at -5% 0%, rgba(47, 158, 65, 0.12), transparent 60%),
+    radial-gradient(800px 480px at 110% 110%, rgba(200, 25, 30, 0.07), transparent 55%),
+    var(--fundo);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--foco, var(--verde-escuro)); outline-offset: 3px; }
+
+/* Barra verde do topo, com a marca IFhoot! */
+.barra-marca { --foco: #fff; background: var(--verde); color: #fff; box-shadow: 0 3px 0 var(--verde-escuro); }
+.marca { display: flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: -0.01em; }
+.logo {
+  position: relative; display: grid; place-items: center;
+  width: 38px; height: 38px; border-radius: 11px;
+  background: #fff; color: var(--verde);
+  font-size: 24px; font-weight: 900;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+}
+/* a bolinha vermelha no canto, como nas marcas dos Institutos Federais */
+.logo::before {
+  content: ""; position: absolute; top: -5px; left: -5px;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--vermelho); border: 2px solid #fff;
+}
+
+.botao {
+  padding: 0.75em 1.5em; border-radius: 999px;
+  background: var(--verde-escuro); color: #fff; font-weight: 800;
+  box-shadow: 0 5px 0 #135223;
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.15s, opacity 0.15s;
+}
+.botao:hover { filter: brightness(1.08); }
+.botao:active { transform: translateY(3px); box-shadow: 0 2px 0 #135223; }
+.botao:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.botao-sec {
+  padding: 0.7em 1.25em; border-radius: 999px;
+  background: var(--cartao); border: 1px solid var(--borda); font-weight: 700;
+}
+.botao-sec:hover { background: var(--cartao-2); }
+.barra-marca .botao-sec { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.45); color: #fff; }
+.barra-marca .botao-sec:hover { background: rgba(255, 255, 255, 0.26); }
+
+/* cores das alternativas A, B, C, D */
+.op-0 { --cor: var(--op-0); --cor-texto: var(--op-0-texto); }
+.op-1 { --cor: var(--op-1); --cor-texto: var(--op-1-texto); }
+.op-2 { --cor: var(--op-2); --cor-texto: var(--op-2-texto); }
+.op-3 { --cor: var(--op-3); --cor-texto: var(--op-3-texto); }
+
+.letra {
+  flex: none; display: grid; place-items: center;
+  width: 1.8em; height: 1.8em; border-radius: 0.45em;
+  background: rgba(255, 255, 255, 0.24); color: inherit; font-weight: 900;
+}
+.op-2 .letra { background: rgba(0, 0, 0, 0.12); }
+
+.aviso {
+  position: fixed; left: 50%; bottom: 28px; z-index: 20;
+  max-width: min(92vw, 560px); padding: 12px 20px; border-radius: 14px;
+  background: var(--erro); color: #fff; font-weight: 700; text-align: center;
+  box-shadow: var(--sombra);
+  opacity: 0; pointer-events: none; transform: translate(-50%, 24px);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.aviso.visivel { opacity: 1; transform: translate(-50%, 0); }
+.aviso[data-tipo="info"] { background: var(--texto); }
+
+@keyframes entrar { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { opacity: 0; transform: scale(0.6); } 70% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes pulsar { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

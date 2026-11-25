@@ -1,0 +1,4 @@
+node_modules/
+# tem a senha do Wi-Fi: não vai para o GitHub
+config.json
+resultados/*.csv
