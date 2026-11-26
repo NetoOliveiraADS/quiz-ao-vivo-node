@@ -110,10 +110,26 @@
 <aside class="painel-padroes" id="painel-padroes" aria-labelledby="titulo-padroes" hidden>
   <h2 id="titulo-padroes">Padrões em ação</h2>
   <dl>
-    <div><dt>Singleton</dt><dd id="padroes-sala"></dd></div>
-    <div><dt>State</dt><dd id="padroes-estado"></dd></div>
-    <div><dt>Strategy</dt><dd id="padroes-estrategia"></dd></div>
-    <div><dt>Observer</dt><dd id="padroes-observadores"></dd><dd class="ultimo-aviso" id="padroes-aviso" aria-live="polite"></dd></div>
+    <div class="cartao-padrao cartao-estado">
+      <dt>State</dt>
+      <dd id="padroes-estado"></dd>
+    </div>
+    <div class="cartao-padrao cartao-sala">
+      <dt>Singleton</dt>
+      <dd id="padroes-sala"></dd>
+    </div>
+    <div class="cartao-padrao cartao-regra">
+      <dt>Strategy</dt>
+      <dd id="padroes-estrategia"></dd>
+    </div>
+    <div class="cartao-padrao cartao-observadores">
+      <dt>Observer</dt>
+      <dd id="padroes-observadores"></dd>
+      <dd class="aviso-do-observador">
+        <span class="rotulo-aviso">Último aviso</span>
+        <span id="padroes-aviso" aria-live="polite" aria-atomic="true"></span>
+      </dd>
+    </div>
   </dl>
 </aside>
 
